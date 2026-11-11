@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Moon Watch Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: one centered night-sky card per puzzle, big tap tiles below, a star tally pinned on top */
+:root{
+  --sky:#141a3a; --sky-2:#1f2752; --ink:#f3efe0; --dim:#a8b0d8;
+  --moon:#f6e7a8; --shadow:#2b3366; --good:#7ee0a6; --miss:#ff9a8a; --tile:#262f63; --tile-hi:#33407e;
+  --display:"Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:radial-gradient(120% 80% at 50% 0%, var(--sky-2), var(--sky) 70%) fixed, var(--sky);color:var(--ink);font-family:var(--body);font-size:18px;
+  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));padding-block:20px 40px}
+#stars-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+main{position:relative;z-index:1;max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.back{color:var(--dim);font-weight:800;text-decoration:none}
+h1{font-family:var(--display);font-weight:700;font-size:1.6rem;margin:0;letter-spacing:.01em}
+.tally{font-family:var(--display);font-size:1.25rem;letter-spacing:.08em;color:var(--moon)}
+.tally .off{opacity:.25}
+.progress{font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);font-weight:800}
+.card{background:color-mix(in srgb, var(--sky-2) 80%, transparent);border:1px solid var(--tile-hi);border-radius:28px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+.q{font-family:var(--display);font-weight:600;font-size:1.55rem;margin:0;text-wrap:balance;line-height:1.25}
+.pic{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap}
+.pic .slot{width:86px;height:86px;border:3px dashed var(--dim);border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:2.2rem;color:var(--dim)}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
+.opts.one{grid-template-columns:1fr}
+button{font:inherit;color:inherit;cursor:pointer}
+.opt{background:var(--tile);border:3px solid var(--tile-hi);border-radius:20px;min-height:76px;padding:14px;font-weight:800;font-size:1.1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:transform .12s, background .12s}
+.opt:hover{background:var(--tile-hi)}
+.opt:active{transform:scale(.96)}
+.opt:focus-visible,.big:focus-visible,.send:focus-visible{outline:4px solid var(--moon);outline-offset:3px}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 22%,var(--tile))}
+.opt.wrong{border-color:var(--miss);opacity:.55}
+.opt.done{opacity:.35;pointer-events:none}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+.hint{background:color-mix(in srgb,var(--miss) 16%,transparent);border:2px solid var(--miss);border-radius:16px;padding:12px 16px;font-weight:700;max-width:52ch}
+.yay{background:color-mix(in srgb,var(--good) 16%,transparent);border:2px solid var(--good);border-radius:16px;padding:12px 16px;font-weight:700;max-width:52ch}
+.yay b{color:var(--good)}
+.big{background:var(--moon);color:var(--sky);border:0;border-radius:999px;padding:18px 40px;font-family:var(--display);font-weight:700;font-size:1.35rem;min-height:64px}
+.big:active{transform:scale(.97)}
+.send{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;background:var(--good);color:var(--sky);font-family:var(--display);font-size:1.5rem;font-weight:700;border-radius:20px;min-height:72px;padding:8px 28px;box-shadow:0 6px 0 #3a9c66}
+.send:active{transform:translateY(4px);box-shadow:0 2px 0 #3a9c66}
+.lead{color:var(--dim);margin:0;max-width:48ch;line-height:1.45}
+.final-stars{font-size:3rem;letter-spacing:.1em;color:var(--moon)}
+.final-stars .off{opacity:.2}
+.small{font-size:.9rem;color:var(--dim)}
+@media (prefers-reduced-motion: reduce){.shake{animation:none}.opt{transition:none}}
+</style>
+</head>
+<body>
+<canvas id="stars-bg" aria-hidden="true"></canvas>
+<main>
+  <p style="margin:0"><a class="back" href="../">← Mina's activities</a></p>
+  <header>
+    <h1>Moon Watch Club</h1>
+    <div class="tally" id="tally" aria-label="Stars"></div>
+  </header>
+  <div class="progress" id="progress"></div>
+  <section class="card" id="stage" aria-live="polite"></section>
+</main>
+
+<script src="../../assets/log.js"></script>
+<script>
+// Best score is kept only in this browser (localStorage). assets/log.js sends open/finish + score to Dad's log sheet.
+// "Send Dad my score": opens Messages with the score typed in. No recipient, no tracking.
+function smsHref(text){const t=encodeURIComponent(text);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+
+const NS="http://www.w3.org/2000/svg";
+// phase: 0 new, .25 first quarter, .5 full, .75 third quarter. Lit on the right while growing.
+function moon(phase,size=86){
+  const r=40,c=50;
+  const svg=document.createElementNS(NS,"svg");
+  svg.setAttribute("viewBox","0 0 100 100");svg.setAttribute("width",size);svg.setAttribute("height",size);
+  svg.setAttribute("aria-hidden","true");
+  const base=document.createElementNS(NS,"circle");
+  base.setAttribute("cx",c);base.setAttribute("cy",c);base.setAttribute("r",r);
+  base.setAttribute("fill","var(--shadow)");base.setAttribute("stroke","var(--dim)");base.setAttribute("stroke-opacity",".35");base.setAttribute("stroke-width","1.5");
+  svg.appendChild(base);
+  const p=((phase%1)+1)%1;
+  if(Math.abs(p-0.5)<0.001){
+    const f=document.createElementNS(NS,"circle");f.setAttribute("cx",c);f.setAttribute("cy",c);f.setAttribute("r",r);f.setAttribute("fill","var(--moon)");svg.appendChild(f);
+  }else if(p>0.001 && p<0.999){
+    const k=Math.abs(r*Math.cos(2*Math.PI*p));
+    let s1,s2;
+    if(p<0.5){s1=1;s2=p<0.25?0:1;}else{s1=0;s2=p<0.75?0:1;}
+    const d=`M${c} ${c-r} A${r} ${r} 0 0 ${s1} ${c} ${c+r} A${k.toFixed(2)} ${r} 0 0 ${s2} ${c} ${c-r} Z`;
+    const path=document.createElementNS(NS,"path");path.setAttribute("d",d);path.setAttribute("fill","var(--moon)");svg.appendChild(path);
+  }
+  return svg;
+}
+
+const PUZZLES=[
+  {type:"pick",q:"Which moon is this?",pic:[0.5],
+   opts:[{t:"Full moon",ok:true},{t:"New moon"},{t:"First quarter"},{t:"Crescent"}],
+   hint:"Look how much is shining. Is any part dark at all?",
+   fact:"A full moon rises right around sunset, so it shines all night long."},
+  {type:"pick",q:"Spot the pattern! Which moon comes next?",pic:[0,0.12,0.25,"?"],
+   opts:[{m:0.37,t:"This one",ok:true},{m:0.88,t:"This one"},{m:0,t:"This one"},{m:0.75,t:"This one"}],
+   hint:"Each night a little MORE of the moon lights up. Find the one with more light than the half moon.",
+   fact:"That bumpy, almost-full moon is called a waxing gibbous."},
+  {type:"pick",q:"Is this moon growing or shrinking?",pic:[0.85],
+   opts:[{t:"Waxing (growing)"},{t:"Waning (shrinking)",ok:true}],
+   hint:"Try this rhyme: Lit on the right, it's growing bright. Lit on the left, it's leaving the sky!",
+   fact:"Waning means getting smaller. In a few nights this crescent will vanish into a new moon."},
+  {type:"order",q:"Tap the moons in order, from new moon to full moon.",phases:[0,0.12,0.25,0.37,0.5],
+   hint:"Start with the darkest moon, then pick the one with just a little more light each time.",
+   fact:"Going from new moon to full moon takes about two weeks."},
+  {type:"pick",q:"Why does the moon seem to change shape?",pic:[0.12,0.25,0.37],
+   opts:[{t:"Earth's shadow covers part of it"},{t:"We see different amounts of its sunny side as it travels around Earth",ok:true},{t:"Clouds block part of it"},{t:"The moon really changes shape"}],
+   hint:"The Sun always lights up half of the moon. What changes is how much of that bright half faces us.",
+   fact:"One full trip through all the phases takes about 29.5 days. That's about one month, and 'month' comes from 'moon'!"}
+];
+
+let idx=0, stars=[], missed=false;
+const stage=document.getElementById("stage"), tally=document.getElementById("tally"), prog=document.getElementById("progress");
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+function drawTally(){tally.innerHTML="";for(let i=0;i<PUZZLES.length;i++){const s=el("span",stars[i]?"":"off","★");tally.appendChild(s);}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function start(){
+  stage.innerHTML="";prog.textContent="Tonight's sky";drawTally();
+  const row=el("div","pic");[0.12,0.25,0.5,0.75,0.88].forEach(p=>row.appendChild(moon(p,64)));
+  stage.append(row, el("h2","q","Can you crack 5 moon puzzles?"),
+    el("p","lead","Get a puzzle right on your first try and you earn a star. A wrong tap gives you a clue, so keep going!"));
+  let best=null;try{best=localStorage.getItem("moonwatch-best");}catch(e){}
+  if(best!==null) stage.appendChild(el("p","small",`Your best so far: ${best} of 5 stars`));
+  const b=el("button","big","Start");b.onclick=()=>{idx=0;stars=[];show();};stage.appendChild(b);
+}
+
+function show(){
+  missed=false;const P=PUZZLES[idx];stage.innerHTML="";drawTally();
+  prog.textContent=`Puzzle ${idx+1} of ${PUZZLES.length}`;
+  stage.appendChild(el("h2","q",P.q));
+  const hintBox=el("div","hint");hintBox.hidden=true;
+  if(P.type==="pick"){
+    const row=el("div","pic");P.pic.forEach(p=>row.appendChild(p==="?"?el("div","slot","?"):moon(p,P.pic.length>1?76:150)));stage.appendChild(row);
+    const opts=el("div","opts");if(P.opts.length===2)opts.style.gridTemplateColumns="repeat(2,minmax(0,1fr))";
+    shuffle(P.opts).forEach(o=>{
+      const b=el("button","opt");b.type="button";
+      if(o.m!=null){b.appendChild(moon(o.m,70));b.setAttribute("aria-label","Moon picture");}else b.textContent=o.t;
+      b.onclick=()=>{
+        if(o.ok){b.classList.add("right");opts.querySelectorAll(".opt").forEach(x=>{if(x!==b)x.classList.add("done");});win(hintBox);}
+        else{missed=true;b.classList.add("wrong","shake");b.disabled=true;hintBox.textContent="Clue: "+P.hint;hintBox.hidden=false;}
+      };
+      opts.appendChild(b);
+    });
+    stage.append(opts,hintBox);
+  }else{
+    let next=0;const opts=el("div","opts");opts.style.gridTemplateColumns="repeat(auto-fit,minmax(96px,1fr))";
+    const order=P.phases;
+    const tiles=shuffle(order.map((p,i)=>({p,i})));
+    const status=el("p","lead","Next: tap the new moon (the dark one).");
+    tiles.forEach(t=>{
+      const b=el("button","opt");b.type="button";b.appendChild(moon(t.p,70));b.setAttribute("aria-label","Moon picture");
+      const tag=el("span","small","");b.appendChild(tag);
+      b.onclick=()=>{
+        if(t.i===next){b.classList.add("right");b.disabled=true;tag.textContent=String(next+1);next++;
+          status.textContent=next<order.length?`Nice! Now tap moon number ${next+1}.`:"";
+          if(next===order.length) win(hintBox);
+        }else{
+          missed=true;b.classList.remove("shake");void b.offsetWidth;b.classList.add("shake");hintBox.textContent="Clue: "+P.hint;hintBox.hidden=false;
+        }
+      };
+      opts.appendChild(b);
+    });
+    stage.append(status,opts,hintBox);
+  }
+}
+
+function win(hintBox){
+  const P=PUZZLES[idx];hintBox.hidden=true;stars[idx]=!missed;drawTally();
+  const y=el("div","yay");const b1=el("b",null,missed?"You got it! ":"First try! You earned a star. ");y.append(b1,document.createTextNode(P.fact));
+  const n=el("button","big",idx<PUZZLES.length-1?"Next puzzle":"See my stars");
+  n.onclick=()=>{idx++;idx<PUZZLES.length?show():finish();};
+  stage.append(y,n);n.focus({preventScroll:true});
+  y.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+}
+
+function finish(){
+  const got=stars.filter(Boolean).length;stage.innerHTML="";drawTally();prog.textContent="All done";
+  try{const b=parseInt(localStorage.getItem("moonwatch-best")||"-1",10);if(got>b)localStorage.setItem("moonwatch-best",String(got));}catch(e){}
+  if(window.studyLog)studyLog("finish",got,PUZZLES.length);
+  const fs=el("div","final-stars");for(let i=0;i<PUZZLES.length;i++)fs.appendChild(el("span",stars[i]?"":"off","★"));
+  const msg=got===5?"Perfect sky! You're a true moon watcher.":got>=3?"Great moon watching!":"Nice work, moon explorer!";
+  const send=el("a","send","📨 Send Dad my score");send.id="sendScore";
+  send.href=smsHref(`Mina here! I got ${got}/${PUZZLES.length} stars on Moon Watch Club 🎉`);
+  stage.append(moon(0.5,120),el("h2","q",`You got ${got} of 5 stars!`),fs,el("p","lead",msg+" Tonight, peek outside and see which moon phase you can spot."),send);
+  const again=el("button","big","Play again");again.onclick=()=>{idx=0;stars=[];show();};stage.appendChild(again);
+}
+
+// twinkly background
+(function(){
+  const cv=document.getElementById("stars-bg"),ctx=cv.getContext("2d");let pts=[];
+  function size(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;cv.style.width=innerWidth+"px";cv.style.height=innerHeight+"px";
+    pts=Array.from({length:90},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:(Math.random()*1.2+.3)*devicePixelRatio,a:Math.random()}));draw();}
+  function draw(){ctx.clearRect(0,0,cv.width,cv.height);pts.forEach(p=>{ctx.globalAlpha=.25+.5*p.a;ctx.fillStyle="#f3efe0";ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();});}
+  addEventListener("resize",size);size();
+})();
+
+start();
+</script>
+</body>
+</html>
