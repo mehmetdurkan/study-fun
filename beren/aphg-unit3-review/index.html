@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Culture on the Move</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Layout: one narrow phone column — hero, diffusion picture, flip cards, scenario quiz, score */
+:root{
+  --bg:#eef6f4; --card:#ffffff; --fg:#162a2a; --muted:#5d7472;
+  --accent:#0f9d8a; --accent2:#f2994a; --good:#1aa37a; --bad:#e0485c; --line:#d6e8e4;
+  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1b1b; --card:#172726; --fg:#e8f5f2; --muted:#9bb8b4;
+  --accent:#3cc9b4; --accent2:#ffb067; --good:#3ccf9e; --bad:#ff6b7d; --line:#284140; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1b1b; --card:#172726; --fg:#e8f5f2; --muted:#9bb8b4;
+  --accent:#3cc9b4; --accent2:#ffb067; --good:#3ccf9e; --bad:#ff6b7d; --line:#284140; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:40px}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.back{color:var(--muted);font-weight:800;text-decoration:none;font-size:15px}
+.back:hover{text-decoration:underline}
+.tag{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2)}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+h2{font-family:var(--display);font-weight:600;font-size:20px;margin:0 0 8px}
+.hero{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:22px;padding:20px}
+.hero .tag{color:#fff;opacity:.85}
+.hero p{margin:0;opacity:.95}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.card p{margin:0 0 8px}
+.hint{font-size:14px;color:var(--muted)}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--body);fill:var(--fg);font-size:12px}
+svg .lbl{font-family:var(--display);font-weight:600;font-size:13px}
+svg .sm{fill:var(--muted);font-size:10.5px}
+.flips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.flip{font:inherit;color:var(--fg);min-height:92px;padding:10px 12px;border-radius:14px;border:2px solid var(--line);background:transparent;cursor:pointer;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.flip b{font-family:var(--display);font-weight:600;font-size:16px;color:var(--accent)}
+.flip span{font-size:13.5px;color:var(--muted)}
+.flip.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.flip.on span{color:var(--fg)}
+.flip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.q{display:flex;flex-direction:column;gap:8px}
+.q .num{font-family:var(--display);font-size:13px;color:var(--muted)}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.opt:disabled{cursor:default}
+.why{font-size:14px;color:var(--muted)}
+.score{text-align:center}
+.big{font-family:var(--display);font-size:44px;font-weight:700;color:var(--accent)}
+.send{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;width:100%;min-height:52px;padding:10px 16px;border-radius:14px;text-decoration:none;font-family:var(--display);font-weight:600;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.send:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.foot{text-align:center;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.opt,.flip{transition:border-color .15s,background .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p style="margin:0"><a class="back" href="../">← Beren's activities</a></p>
+  <header class="hero">
+    <div class="tag">APHG Unit 3 · 5 minutes</div>
+    <h1>Culture on the move</h1>
+    <p>How ideas, foods, songs and religions spread, and what happens when cultures meet. Quick warm-up for the Unit 3 test.</p>
+  </header>
+
+  <section class="card">
+    <h2>The four ways culture spreads</h2>
+    <svg viewBox="0 0 340 236" role="img" aria-label="Four panels: relocation, where people carry a trait to a new place; contagious, spreading person to person in all directions; hierarchical, big city to smaller cities to towns; stimulus, the idea spreads but changes to fit">
+      <!-- Relocation -->
+      <g>
+        <rect x="2" y="2" width="164" height="112" rx="12" fill="var(--accent)" opacity=".08"/>
+        <text x="14" y="22" class="lbl">Relocation</text>
+        <circle cx="38" cy="66" r="18" fill="none" stroke="var(--accent)" stroke-width="2"/>
+        <circle cx="134" cy="66" r="18" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 3"/>
+        <circle cx="38" cy="66" r="5" fill="var(--accent2)"/><circle cx="134" cy="66" r="5" fill="var(--accent2)"/>
+        <path d="M58 66 L110 66" stroke="var(--muted)" stroke-width="1.6" fill="none"/>
+        <path d="M110 61 L116 66 L110 71" stroke="var(--muted)" stroke-width="1.6" fill="none"/>
+        <text x="14" y="104" class="sm">People move and bring it along</text>
+      </g>
+      <!-- Contagious -->
+      <g>
+        <rect x="174" y="2" width="164" height="112" rx="12" fill="var(--accent)" opacity=".08"/>
+        <text x="186" y="22" class="lbl">Contagious</text>
+        <circle cx="256" cy="62" r="34" fill="none" stroke="var(--accent)" stroke-width="1.2" opacity=".35"/>
+        <circle cx="256" cy="62" r="20" fill="none" stroke="var(--accent)" stroke-width="1.4" opacity=".6"/>
+        <circle cx="256" cy="62" r="6" fill="var(--accent2)"/>
+        <g fill="var(--accent2)" opacity=".75">
+          <circle cx="276" cy="62" r="3.5"/><circle cx="236" cy="62" r="3.5"/><circle cx="256" cy="42" r="3.5"/><circle cx="256" cy="82" r="3.5"/>
+          <circle cx="288" cy="44" r="3"/><circle cx="224" cy="80" r="3"/><circle cx="226" cy="42" r="3"/><circle cx="287" cy="81" r="3"/>
+        </g>
+        <text x="186" y="108" class="sm">Person to person, everyone nearby</text>
+      </g>
+      <!-- Hierarchical -->
+      <g>
+        <rect x="2" y="122" width="164" height="112" rx="12" fill="var(--accent)" opacity=".08"/>
+        <text x="14" y="142" class="lbl">Hierarchical</text>
+        <g stroke="var(--muted)" stroke-width="1.4">
+          <path d="M84 166 L50 190"/><path d="M84 166 L118 190"/>
+          <path d="M50 190 L34 210"/><path d="M50 190 L66 210"/><path d="M118 190 L102 210"/><path d="M118 190 L134 210"/>
+        </g>
+        <circle cx="84" cy="164" r="9" fill="var(--accent2)"/>
+        <circle cx="50" cy="190" r="6" fill="var(--accent2)" opacity=".8"/><circle cx="118" cy="190" r="6" fill="var(--accent2)" opacity=".8"/>
+        <g fill="var(--accent2)" opacity=".6"><circle cx="34" cy="212" r="3.5"/><circle cx="66" cy="212" r="3.5"/><circle cx="102" cy="212" r="3.5"/><circle cx="134" cy="212" r="3.5"/></g>
+        <text x="14" y="230" class="sm">Big city first, then down the ladder</text>
+      </g>
+      <!-- Stimulus -->
+      <g>
+        <rect x="174" y="122" width="164" height="112" rx="12" fill="var(--accent)" opacity=".08"/>
+        <text x="186" y="142" class="lbl">Stimulus</text>
+        <rect x="196" y="164" width="34" height="34" rx="3" fill="var(--accent2)" opacity=".85"/>
+        <path d="M240 181 L272 181" stroke="var(--muted)" stroke-width="1.6" fill="none"/>
+        <path d="M266 176 L272 181 L266 186" stroke="var(--muted)" stroke-width="1.6" fill="none"/>
+        <rect x="284" y="164" width="34" height="34" rx="17" fill="var(--accent2)" opacity=".85"/>
+        <text x="186" y="230" class="sm">The idea spreads, but changes to fit</text>
+      </g>
+    </svg>
+    <p class="hint" style="margin-top:10px">Contagious and hierarchical are both <b>expansion</b> diffusion: the trait stays home and spreads outward. Relocation means it travels with people.</p>
+  </section>
+
+  <section class="card">
+    <h2>Vocab flip</h2>
+    <p class="hint">Say the meaning in your head, then tap to check.</p>
+    <div class="flips" id="flips"></div>
+  </section>
+
+  <section id="quiz" class="card" style="display:flex;flex-direction:column;gap:20px">
+    <div><h2>Name that process</h2><p class="hint" style="margin:0">10 real-world scenarios. Pick the term that fits best.</p></div>
+  </section>
+
+  <section id="result" class="card score" hidden>
+    <div class="big" id="scoreNum">0/10</div>
+    <p id="scoreMsg"></p>
+    <a class="send" id="sendScore" href="#">📲 Send Dad my score</a>
+  </section>
+
+  <p class="foot">Tip for the FRQ: name the term, then give a real example. That's two points, not one.</p>
+</div>
+
+<script src="../../assets/log.js"></script>
+<script>
+const NOTE_ID = "2026-11-11-aphg-unit3";
+const CARDS = [
+  ["Ethnocentrism","Judging another culture by your own culture's standards."],
+  ["Cultural relativism","Understanding a culture on its own terms, without judging."],
+  ["Sense of place","The feelings and meaning people attach to a place."],
+  ["Placelessness","Places that look the same everywhere (same malls, same chains)."],
+  ["Sequent occupance","Layers of past cultures still visible in one landscape."],
+  ["Time-space convergence","Places feel closer because tech and travel got faster."],
+  ["Lingua franca","A shared language people use when their first languages differ."],
+  ["Universalizing religion","Seeks converts worldwide (Christianity, Islam, Buddhism)."],
+  ["Ethnic religion","Tied to one group and place, few converts (Hinduism, Judaism)."],
+  ["Acculturation","Adopting some of a new culture while keeping your own."],
+  ["Assimilation","Giving up your old culture and fully taking on the new one."],
+  ["Syncretism","Two cultures blend into something new."]
+];
+const flips=document.getElementById("flips");
+CARDS.forEach(([term,def])=>{
+  const b=document.createElement("button"); b.className="flip"; b.setAttribute("aria-pressed","false");
+  b.innerHTML=`<b></b><span hidden></span>`;
+  b.querySelector("b").textContent=term; b.querySelector("span").textContent=def;
+  b.onclick=()=>{const on=b.classList.toggle("on"); b.setAttribute("aria-pressed",on); b.querySelector("span").hidden=!on;};
+  flips.appendChild(b);
+});
+
+const QS = [
+  {q:"A K-pop group plays Seoul, then Tokyo, Los Angeles and London, and only later catches on in smaller towns. Which diffusion?", o:["Contagious","Hierarchical","Relocation","Stimulus"], a:1, w:"It jumps between big, connected cities first, then trickles down. That's hierarchical."},
+  {q:"A new dance trend spreads from friend to friend on TikTok until almost everyone at school knows it. Which diffusion?", o:["Hierarchical","Relocation","Contagious","Stimulus"], a:2, w:"It spreads person to person to everyone nearby, regardless of status. Contagious."},
+  {q:"McDonald's in India skips beef and sells the potato McAloo Tikki burger. Which diffusion?", o:["Stimulus","Relocation","Hierarchical","Contagious"], a:0, w:"The fast-food idea spread, but it changed to fit local beliefs about beef. Stimulus."},
+  {q:"Irish immigrants bring St. Patrick's Day parades to Boston. Which diffusion?", o:["Contagious","Stimulus","Hierarchical","Relocation"], a:3, w:"The tradition moved because the people moved. Relocation."},
+  {q:"Which of these is a universalizing religion?", o:["Hinduism","Buddhism","Judaism","Shinto"], a:1, w:"Buddhism actively spread across Asia and seeks converts. The others are ethnic religions tied to a group and place."},
+  {q:"A family moves to Texas, keeps speaking their language at home, but starts eating Tex-Mex and cheering for local teams. What's this?", o:["Assimilation","Acculturation","Syncretism","Ethnocentrism"], a:1, w:"They take on some of the new culture but keep their own. Acculturation. Assimilation would mean dropping the old culture."},
+  {q:"Día de los Muertos mixes Indigenous traditions honoring the dead with Catholic All Souls' Day. What's this?", o:["Syncretism","Assimilation","Placelessness","Relocation"], a:0, w:"Two cultures blended into something new. Syncretism."},
+  {q:"English is used at an international business meeting where no one speaks it as a first language. English is acting as a…", o:["Creole","Dialect","Lingua franca","Toponym"], a:2, w:"A shared go-between language for people with different first languages is a lingua franca."},
+  {q:"In one old city you can see Roman ruins, a medieval church and a modern glass tower on the same street. Which concept?", o:["Sense of place","Sequent occupance","Time-space convergence","Cultural relativism"], a:1, w:"Each culture that lived there left a layer on the landscape. Sequent occupance."},
+  {q:"Colonialism helped spread English, Spanish and French around the world. That's an example of a…", o:["Contemporary cause of diffusion","Historical cause of diffusion","Stimulus diffusion","Cultural hearth"], a:1, w:"Colonialism, imperialism and trade are the historical causes. Globalization and social media are the contemporary ones."}
+];
+// "Send Dad my score": opens Messages with the score typed in. No recipient, no tracking.
+function smsHref(text){const t=encodeURIComponent(text);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function setSend(score,total){document.getElementById("sendScore").href=smsHref(`Beren here. Got ${score}/${total} on the APHG Unit 3 review ${score===total?"💯":"🌍"}`)}
+const answers = new Array(QS.length).fill(null);
+const quiz = document.getElementById("quiz");
+QS.forEach((item,i)=>{
+  const box=document.createElement("div"); box.className="q";
+  box.innerHTML=`<div class="num">Question ${i+1} of ${QS.length}</div><p style="margin:0;font-weight:700"></p><div class="opts"></div><div class="why" hidden></div>`;
+  box.querySelector("p").textContent=item.q;
+  const opts=box.querySelector(".opts"), why=box.querySelector(".why");
+  item.o.forEach((txt,j)=>{
+    const b=document.createElement("button"); b.className="opt"; b.id=`q${i}o${j}`; b.textContent=txt;
+    b.onclick=()=>{
+      if(answers[i]!==null) return;
+      answers[i]=j;
+      [...opts.children].forEach((c,k)=>{c.disabled=true; if(k===item.a) c.classList.add("right"); else if(k===j) c.classList.add("wrong");});
+      why.textContent=(j===item.a?"Yes! ":"Not quite. ")+item.w; why.hidden=false;
+      if(answers.every(x=>x!==null)) finish();
+    };
+    opts.appendChild(b);
+  });
+  quiz.appendChild(box);
+});
+
+function finish(){
+  const score=answers.filter((x,i)=>x===QS[i].a).length;
+  document.getElementById("scoreNum").textContent=`${score}/${QS.length}`;
+  document.getElementById("scoreMsg").textContent= score===QS.length?"Perfect. Unit 3 is yours.": score>=7?"Nice work. Flip the vocab cards you missed once more.":"Good start. Go through the four diffusion pictures and the flip cards again, then retry.";
+  document.getElementById("result").hidden=false;
+  setSend(score,QS.length);
+  if(window.studyLog)studyLog("finish",score,QS.length);
+  try{localStorage.setItem("nn-"+NOTE_ID,JSON.stringify({score,total:QS.length,at:new Date().toISOString()}));}catch(e){}
+}
+try{const prev=JSON.parse(localStorage.getItem("nn-"+NOTE_ID)||"null");
+  if(prev){document.getElementById("result").hidden=false;
+    document.getElementById("scoreNum").textContent=`${prev.score}/${prev.total}`;
+    document.getElementById("scoreMsg").textContent="Your last score. Answer again above for another go.";
+    setSend(prev.score,prev.total);}}catch(e){}
+</script>
+</body>
+</html>
