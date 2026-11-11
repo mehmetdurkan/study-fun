@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Moon Pie Bakery</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Layout: one card at a time, centered column, big tap buttons, night-sky bakery */
+:root{
+  --sky:#1b1442; --sky2:#2c2168; --card:#fff7ea; --ink:#2a2140;
+  --pie:#f4a340; --crust:#b8611e; --empty:#ead9c2;
+  --good:#2fb36b; --oops:#e8576a; --star:#ffd54a;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:#1b1442 radial-gradient(circle at 20% 10%,var(--sky2),var(--sky) 60%) fixed;color:var(--ink);font-family:var(--body);font-size:18px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:40px}
+img{max-width:100%}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.back{color:#cfc6ff;font-weight:800;text-decoration:none;font-size:16px}
+.back:hover{text-decoration:underline}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#fff}
+h1{font-family:var(--display);font-size:clamp(28px,7vw,40px);line-height:1;margin:0;text-wrap:balance}
+.stars{font-size:26px;letter-spacing:2px;color:var(--star);white-space:nowrap}
+.card{background:var(--card);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:16px;box-shadow:0 10px 0 rgba(0,0,0,.25)}
+.step{font-weight:800;color:var(--crust);text-transform:uppercase;letter-spacing:.08em;font-size:14px}
+.q{font-family:var(--display);font-size:clamp(22px,5.5vw,28px);line-height:1.2;margin:0}
+.pies{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:20px}
+.pies svg{width:clamp(70px,20vw,96px);height:auto}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+button{font:inherit;cursor:pointer;border:0}
+.opt{background:#fff;border:4px solid var(--empty);border-radius:18px;min-height:80px;padding:10px;color:var(--ink);display:flex;align-items:center;justify-content:center}
+.opt:focus-visible,.go:focus-visible{outline:4px solid var(--star);outline-offset:3px}
+.opt.right{border-color:var(--good);background:#e6f8ee}
+.opt.wrong{border-color:var(--oops);background:#fde9ec}
+.opt[disabled]{cursor:default}
+.frac{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-size:30px;font-weight:800}
+.frac .f{display:inline-flex;flex-direction:column;align-items:center;font-size:22px;line-height:1}
+.frac .f span:first-child{border-bottom:3px solid currentColor;padding:0 4px}
+.say{border-radius:16px;padding:12px 14px;font-weight:700;line-height:1.4}
+.say.good{background:#e6f8ee;color:#16683c}
+.say.oops{background:#fde9ec;color:#9a2537}
+.go{background:var(--pie);color:#3a1d05;font-family:var(--display);font-size:24px;font-weight:800;border-radius:18px;min-height:64px;padding:8px 20px;box-shadow:0 6px 0 var(--crust)}
+.go:active{transform:translateY(4px);box-shadow:0 2px 0 var(--crust)}
+.big{font-size:64px;text-align:center;line-height:1}
+.end p{margin:0;text-align:center}
+.best{font-weight:700;color:#6b5a86;text-align:center}
+@media (prefers-reduced-motion:no-preference){.pop{animation:pop .35s ease}@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.05)}100%{transform:scale(1)}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">← All activities</a>
+  <header><h1>Moon Pie Bakery</h1><div class="stars" id="stars" aria-label="stars">☆☆☆☆☆</div></header>
+  <section class="card" id="card" aria-live="polite">
+    <div class="step">Welcome, baker!</div>
+    <p class="q">The astronauts are hungry. Each moon pie is cut into equal slices. Help count the pies!</p>
+    <div class="pies" id="introPies"></div>
+    <p class="best" id="best" hidden></p>
+    <button class="go" id="start">Start baking</button>
+  </section>
+</div>
+
+<script>
+// Best score is kept only in this browser (localStorage). Nothing is sent anywhere.
+const KEY='study-fun:mina:moon-pie-bakery:best';
+function getBest(){try{const v=parseInt(localStorage.getItem(KEY),10);return isNaN(v)?null:v}catch(e){return null}}
+function saveBest(s){try{const b=getBest();if(b===null||s>b)localStorage.setItem(KEY,String(s))}catch(e){}}
+
+const F=(w,n,d)=>`<span class="frac">${w?w:''}${n?`<span class="f"><span>${n}</span><span>${d}</span></span>`:''}</span>`;
+function pie(filled,parts){
+  const r=44,c=50;let s=`<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="${c}" cy="${c}" r="${r+4}" fill="var(--crust)"/>`;
+  for(let i=0;i<parts;i++){
+    const a1=(i/parts)*2*Math.PI-Math.PI/2,a2=((i+1)/parts)*2*Math.PI-Math.PI/2;
+    const x1=c+r*Math.cos(a1),y1=c+r*Math.sin(a1),x2=c+r*Math.cos(a2),y2=c+r*Math.sin(a2);
+    const big=(a2-a1)>Math.PI?1:0;
+    s+= parts===1?`<circle cx="${c}" cy="${c}" r="${r}" fill="${i<filled?'var(--pie)':'var(--empty)'}"/>`
+      :`<path d="M${c},${c} L${x1},${y1} A${r},${r} 0 ${big} 1 ${x2},${y2} Z" fill="${i<filled?'var(--pie)':'var(--empty)'}" stroke="var(--crust)" stroke-width="2"/>`;
+  }
+  return s+'</svg>';
+}
+function pies(num,den){let out='',left=num;while(left>0){out+=pie(Math.min(den,left),den);left-=den}return out}
+
+const Q=[
+ {q:"How many moon pies are on this tray?",show:[7,4],
+  opts:[[F(1,3,4),1],[F(0,7,1),0],[F(2,1,4),0]],
+  good:"Yes! 4 slices make 1 whole pie, and 3 slices are left. That's 1 and 3/4.",
+  oops:"Count the full pie first (4 slices = 1 whole). Then count the leftover slices."},
+ {q:"The chef baked 2 and 1/3 pies. How many thirds is that?",show:[7,3],
+  opts:[[F(0,5,3),0],[F(0,7,3),1],[F(0,6,3),0]],
+  good:"Right! 2 wholes = 6 thirds, plus 1 more = 7/3.",
+  oops:"Each whole pie has 3 slices. 2 pies = 6 slices, then add the extra 1."},
+ {q:"An astronaut has 9 half-pies. How many pies is that?",show:[9,2],
+  opts:[[F(4,1,2),1],[F(9,1,2),0],[F(3,1,2),0]],
+  good:"Great! 8 halves make 4 pies, plus 1 half. 4 and 1/2!",
+  oops:"Two halves make one pie. How many pairs fit in 9?"},
+ {q:"Which plate has MORE pie?",show:null,
+  opts:[[F(0,5,4),0],[F(1,2,4),1]],
+  good:"Yes! 1 and 2/4 is 6/4, which is more than 5/4.",
+  oops:"Turn 1 and 2/4 into fourths: 4 + 2 = 6/4. Compare 6/4 and 5/4."},
+ {q:"Rocket snack time! The crew ate 11/4 pies. Which mixed number is that?",show:[11,4],
+  opts:[[F(2,3,4),1],[F(3,1,4),0],[F(1,7,4),0]],
+  good:"Amazing! 8 fourths = 2 pies, 3 fourths left. 2 and 3/4!",
+  oops:"Group the slices in 4s. How many full pies, and how many slices left over?"}
+];
+let i=0,score=0,tries=0;
+const card=document.getElementById('card'),stars=document.getElementById('stars');
+document.getElementById('introPies').innerHTML=pie(4,4)+pie(1,4);
+(function(){const b=getBest(),el=document.getElementById('best');if(b!==null){el.textContent=`Your best so far: ${b} of ${Q.length} stars`;el.hidden=false}})();
+function drawStars(){stars.textContent='★'.repeat(score)+'☆'.repeat(Q.length-score)}
+function show(){
+  const it=Q[i];tries=0;
+  card.innerHTML=`<div class="step">Pie ${i+1} of ${Q.length}</div><p class="q">${it.q}</p>
+   <div class="pies">${it.show?pies(it.show[0],it.show[1]):pie(4,4)+pie(1,4)+'<span style="align-self:center;font-weight:800">or</span>'+pie(4,4)+pie(2,4)}</div>
+   <div class="opts">${it.opts.map((o,k)=>`<button class="opt" id="o${i}_${k}" data-k="${k}">${o[0]}</button>`).join('')}</div>
+   <div id="say"></div>`;
+  card.classList.remove('pop');void card.offsetWidth;card.classList.add('pop');
+  card.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(b));
+}
+function pick(b){
+  const it=Q[i],ok=it.opts[+b.dataset.k][1]===1,say=document.getElementById('say');
+  if(ok){
+    b.classList.add('right');card.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+    if(tries===0){score++;drawStars()}
+    say.innerHTML=`<div class="say good">${it.good}</div><button class="go" id="next" style="margin-top:12px;width:100%">${i<Q.length-1?'Next pie':'See my stars'}</button>`;
+    document.getElementById('next').onclick=()=>{i++;i<Q.length?show():end()};
+  }else{
+    tries++;b.classList.add('wrong');b.disabled=true;
+    say.innerHTML=`<div class="say oops">Almost! ${it.oops}</div>`;
+  }
+}
+function end(){
+  const prev=getBest();saveBest(score);
+  const msg=score===5?"Master Baker! Every pie perfect.":score>=3?"Great baking! The astronauts are full.":"Nice try, baker! Fractions get easier every time.";
+  const bestLine=prev!==null&&score>prev?'<p class="best">New best score!</p>':(prev!==null?`<p class="best">Your best: ${Math.max(prev,score)} of ${Q.length}</p>`:'');
+  card.innerHTML=`<div class="end" style="display:flex;flex-direction:column;gap:14px">
+   <div class="big">${score>=3?'🚀':'🥧'}</div><p class="q">${msg}</p>
+   <p class="stars" style="color:var(--crust);font-size:34px">${'★'.repeat(score)}${'☆'.repeat(Q.length-score)}</p>
+   ${bestLine}
+   <p style="font-weight:800">Tell Dad: “I got ${score} first-try stars!”</p>
+   <button class="go" id="again">Bake again</button></div>`;
+  document.getElementById('again').onclick=()=>{i=0;score=0;drawStars();show()};
+}
+document.getElementById('start').onclick=show;
+</script>
+</body>
+</html>

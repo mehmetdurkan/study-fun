@@ -1,5 +1,26 @@
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mina's Activities</title>
-<style>body{font-family:system-ui,sans-serif;max-width:640px;margin:2rem auto;padding:0 16px;line-height:1.5}</style></head>
-<body><p><a href="../">← Study Fun</a></p><h1>Mina's activities</h1><p>Coming soon.</p></body></html>
+<style>
+:root{--bg:#fff8ef;--ink:#2a2140;--muted:#6b5a86}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:640px;margin:0 auto;padding:2rem 16px}
+.back{color:var(--muted);font-weight:700;text-decoration:none}
+h1{font-size:2rem;margin:.5rem 0 1rem}
+ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px}
+.act{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:20px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#2c2168,#5b3fb0);box-shadow:0 6px 0 rgba(0,0,0,.15)}
+.act:hover,.act:focus-visible{transform:translateY(-2px)}
+.act:focus-visible{outline:4px solid #ffd54a;outline-offset:3px}
+.emoji{font-size:40px;line-height:1}
+.title{font-size:1.25rem;font-weight:800;display:block}
+.sub{opacity:.85;font-size:.95rem}
+.tag{display:inline-block;background:#ffd54a;color:#3a1d05;font-weight:800;font-size:.75rem;border-radius:999px;padding:2px 10px;margin-bottom:4px}
+</style></head>
+<body><div class="wrap">
+<p><a class="back" href="../">← Study Fun</a></p>
+<h1>Mina's activities</h1>
+<ul>
+  <li><a class="act" href="moon-pie-bakery/"><span class="emoji" aria-hidden="true">🥧</span><span><span class="tag">Math</span><span class="title">Moon Pie Bakery</span><span class="sub">5 pie puzzles with mixed numbers and fractions</span></span></a></li>
+</ul>
+</div></body></html>
