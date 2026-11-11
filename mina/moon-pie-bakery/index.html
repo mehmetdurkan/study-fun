@@ -69,8 +69,9 @@ button{font:inherit;cursor:pointer;border:0}
   </section>
 </div>
 
+<script src="../../assets/log.js"></script>
 <script>
-// Best score is kept only in this browser (localStorage). Nothing is sent anywhere.
+// Best score is kept only in this browser (localStorage). assets/log.js sends open/finish + score to Dad's log sheet.
 const KEY='study-fun:mina:moon-pie-bakery:best';
 function getBest(){try{const v=parseInt(localStorage.getItem(KEY),10);return isNaN(v)?null:v}catch(e){return null}}
 function saveBest(s){try{const b=getBest();if(b===null||s>b)localStorage.setItem(KEY,String(s))}catch(e){}}
@@ -142,6 +143,7 @@ function pick(b){
 }
 function end(){
   const prev=getBest();saveBest(score);
+  if(window.studyLog)studyLog("finish",score,Q.length);
   const msg=score===5?"Master Baker! Every pie perfect.":score>=3?"Great baking! The astronauts are full.":"Nice try, baker! Fractions get easier every time.";
   const bestLine=prev!==null&&score>prev?'<p class="best">New best score!</p>':(prev!==null?`<p class="best">Your best: ${Math.max(prev,score)} of ${Q.length}</p>`:'');
   card.innerHTML=`<div class="end" style="display:flex;flex-direction:column;gap:14px">
