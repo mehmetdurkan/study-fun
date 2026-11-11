@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Meiosis and Mutations</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Layout: one narrow phone column — hero card, one diagram, then quiz cards stacked */
+:root{
+  --bg:#f3f1fb; --card:#ffffff; --fg:#1f1b33; --muted:#6b6585;
+  --accent:#7b4dff; --accent2:#ff5fa2; --good:#1aa37a; --bad:#e0485c; --line:#e3def5;
+  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141122; --card:#1f1b33; --fg:#f2efff; --muted:#a59fc4;
+  --accent:#a585ff; --accent2:#ff7db5; --good:#3ccf9e; --bad:#ff6b7d; --line:#332c52; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141122; --card:#1f1b33; --fg:#f2efff; --muted:#a59fc4;
+  --accent:#a585ff; --accent2:#ff7db5; --good:#3ccf9e; --bad:#ff6b7d; --line:#332c52; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:40px}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.back{color:var(--muted);font-weight:800;text-decoration:none;font-size:15px}
+.back:hover{text-decoration:underline}
+.tag{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2)}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+h2{font-family:var(--display);font-weight:600;font-size:20px;margin:0 0 8px}
+.hero{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:22px;padding:20px}
+.hero .tag{color:#fff;opacity:.85}
+.hero p{margin:0;opacity:.95}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.card p{margin:0 0 8px}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--body);fill:var(--fg);font-size:12px}
+.facts{display:grid;gap:8px;margin:8px 0 0;padding:0;list-style:none}
+.facts li{display:flex;gap:10px}
+.facts b{color:var(--accent)}
+.q{display:flex;flex-direction:column;gap:8px}
+.q .num{font-family:var(--display);font-size:13px;color:var(--muted)}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.opt:disabled{cursor:default}
+.why{font-size:14px;color:var(--muted)}
+.score{text-align:center}
+.big{font-family:var(--display);font-size:44px;font-weight:700;color:var(--accent)}
+.foot{text-align:center;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.opt{transition:border-color .15s,background .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p style="margin:0"><a class="back" href="../">← Beren's activities</a></p>
+  <header class="hero">
+    <div class="tag">Bio · 2 minutes · Tue Nov 10</div>
+    <h1>Meiosis: one cell, four new combos</h1>
+    <p>Quick warm-up before tomorrow's Meiosis &amp; Mutations review.</p>
+  </header>
+
+  <section class="card">
+    <h2>The picture</h2>
+    <svg viewBox="0 0 340 150" role="img" aria-label="One cell with 46 chromosomes divides twice into four cells with 23 each">
+      <circle cx="40" cy="75" r="30" fill="var(--accent)" opacity=".25" stroke="var(--accent)" stroke-width="2"/>
+      <text x="40" y="79" text-anchor="middle">2n=46</text>
+      <circle cx="150" cy="40" r="24" fill="var(--accent2)" opacity=".22" stroke="var(--accent2)" stroke-width="2"/>
+      <circle cx="150" cy="110" r="24" fill="var(--accent2)" opacity=".22" stroke="var(--accent2)" stroke-width="2"/>
+      <text x="150" y="44" text-anchor="middle">n</text><text x="150" y="114" text-anchor="middle">n</text>
+      <g fill="var(--good)" opacity=".25" stroke="var(--good)" stroke-width="2">
+        <circle cx="270" cy="18" r="15"/><circle cx="270" cy="58" r="15"/><circle cx="270" cy="96" r="15"/><circle cx="270" cy="134" r="15"/>
+      </g>
+      <text x="270" y="22" text-anchor="middle">23</text><text x="270" y="62" text-anchor="middle">23</text>
+      <text x="270" y="100" text-anchor="middle">23</text><text x="270" y="138" text-anchor="middle">23</text>
+      <g stroke="var(--muted)" stroke-width="1.5" fill="none">
+        <path d="M72 68 L124 44"/><path d="M72 82 L124 106"/>
+        <path d="M176 36 L252 20"/><path d="M176 44 L252 58"/><path d="M176 106 L252 96"/><path d="M176 114 L252 132"/>
+      </g>
+      <text x="98" y="148" text-anchor="middle" style="fill:var(--muted)">Meiosis I</text>
+      <text x="214" y="148" text-anchor="middle" style="fill:var(--muted)">Meiosis II</text>
+    </svg>
+    <ul class="facts">
+      <li><b>1→4</b><span>One cell becomes four sex cells, each with half the chromosomes.</span></li>
+      <li><b>Mix</b><span>Crossing over in Prophase I swaps pieces, so no two cells match.</span></li>
+      <li><b>Oops</b><span>A mutation is a change in DNA. Adding or deleting one base shifts every codon after it (frameshift).</span></li>
+    </ul>
+  </section>
+
+  <section id="quiz" class="card" style="display:flex;flex-direction:column;gap:20px"></section>
+
+  <section id="result" class="card score" hidden>
+    <div class="big" id="scoreNum">0/5</div>
+    <p id="scoreMsg"></p>
+  </section>
+
+  <p class="foot">Sleep well. Your brain files this away overnight.</p>
+</div>
+
+<script>
+const NOTE_ID = "2026-11-10-bio-meiosis";
+const QS = [
+  {q:"One cell goes through meiosis. How many cells do you end up with?", o:["2 identical cells","4 genetically different cells","4 identical cells","1 bigger cell"], a:1, w:"Two divisions (Meiosis I and II) give four cells, and crossing over makes them different."},
+  {q:"A human body cell has 46 chromosomes. How many does a sperm or egg cell have?", o:["92","46","23","12"], a:2, w:"Gametes are haploid (n), so half: 23."},
+  {q:"When does crossing over happen?", o:["Prophase I","Metaphase II","Anaphase II","Telophase I"], a:0, w:"Homologous chromosomes pair up in Prophase I and trade pieces."},
+  {q:"One base gets swapped, but the codon still codes for the same amino acid. What kind of mutation?", o:["Frameshift","Nonsense","Silent","Insertion"], a:2, w:"Several codons code for the same amino acid, so the protein doesn't change."},
+  {q:"One extra base is inserted into a gene. Why is that usually a big deal?", o:["It shifts every codon after it","It only changes one amino acid","It deletes the gene","It has no effect"], a:0, w:"Codons are read in threes, so one extra base shifts the reading frame for the rest."}
+];
+const answers = new Array(QS.length).fill(null);
+const quiz = document.getElementById("quiz");
+QS.forEach((item,i)=>{
+  const box=document.createElement("div"); box.className="q";
+  box.innerHTML=`<div class="num">Question ${i+1} of ${QS.length}</div><p style="margin:0;font-weight:700"></p><div class="opts"></div><div class="why" hidden></div>`;
+  box.querySelector("p").textContent=item.q;
+  const opts=box.querySelector(".opts"), why=box.querySelector(".why");
+  item.o.forEach((txt,j)=>{
+    const b=document.createElement("button"); b.className="opt"; b.id=`q${i}o${j}`; b.textContent=txt;
+    b.onclick=()=>{
+      if(answers[i]!==null) return;
+      answers[i]=j;
+      [...opts.children].forEach((c,k)=>{c.disabled=true; if(k===item.a) c.classList.add("right"); else if(k===j) c.classList.add("wrong");});
+      why.textContent=(j===item.a?"Yes! ":"Not quite. ")+item.w; why.hidden=false;
+      if(answers.every(x=>x!==null)) finish();
+    };
+    opts.appendChild(b);
+  });
+  quiz.appendChild(box);
+});
+
+function finish(){
+  const score=answers.filter((x,i)=>x===QS[i].a).length;
+  document.getElementById("scoreNum").textContent=`${score}/${QS.length}`;
+  document.getElementById("scoreMsg").textContent= score===QS.length?"Perfect. You're ready for tomorrow's review.": score>=3?"Nice work. Glance at the ones you missed once more.":"Good try. Reread the three facts above before bed.";
+  document.getElementById("result").hidden=false;
+  try{localStorage.setItem("nn-"+NOTE_ID,JSON.stringify({score,total:QS.length,at:new Date().toISOString()}));}catch(e){}
+}
+try{const prev=JSON.parse(localStorage.getItem("nn-"+NOTE_ID)||"null");
+  if(prev){document.getElementById("result").hidden=false;
+    document.getElementById("scoreNum").textContent=`${prev.score}/${prev.total}`;
+    document.getElementById("scoreMsg").textContent="Your last score. Answer again above for another go.";}}catch(e){}
+</script>
+</body>
+</html>
