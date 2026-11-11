@@ -52,6 +52,8 @@ svg text{font-family:var(--body);fill:var(--fg);font-size:12px}
 .why{font-size:14px;color:var(--muted)}
 .score{text-align:center}
 .big{font-family:var(--display);font-size:44px;font-weight:700;color:var(--accent)}
+.send{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;width:100%;min-height:52px;padding:10px 16px;border-radius:14px;text-decoration:none;font-family:var(--display);font-weight:600;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.send:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .foot{text-align:center;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){.opt{transition:border-color .15s,background .15s}}
 </style>
@@ -97,6 +99,7 @@ svg text{font-family:var(--body);fill:var(--fg);font-size:12px}
   <section id="result" class="card score" hidden>
     <div class="big" id="scoreNum">0/5</div>
     <p id="scoreMsg"></p>
+    <a class="send" id="sendScore" href="#">📲 Send Dad my score</a>
   </section>
 
   <p class="foot">Sleep well. Your brain files this away overnight.</p>
@@ -111,6 +114,9 @@ const QS = [
   {q:"One base gets swapped, but the codon still codes for the same amino acid. What kind of mutation?", o:["Frameshift","Nonsense","Silent","Insertion"], a:2, w:"Several codons code for the same amino acid, so the protein doesn't change."},
   {q:"One extra base is inserted into a gene. Why is that usually a big deal?", o:["It shifts every codon after it","It only changes one amino acid","It deletes the gene","It has no effect"], a:0, w:"Codons are read in threes, so one extra base shifts the reading frame for the rest."}
 ];
+// "Send Dad my score": opens Messages with the score typed in. No recipient, no tracking.
+function smsHref(text){const t=encodeURIComponent(text);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function setSend(score,total){document.getElementById("sendScore").href=smsHref(`Beren here. Got ${score}/${total} on Meiosis & Mutations ${score===total?"💯":"🧬"}`)}
 const answers = new Array(QS.length).fill(null);
 const quiz = document.getElementById("quiz");
 QS.forEach((item,i)=>{
@@ -137,12 +143,14 @@ function finish(){
   document.getElementById("scoreNum").textContent=`${score}/${QS.length}`;
   document.getElementById("scoreMsg").textContent= score===QS.length?"Perfect. You're ready for tomorrow's review.": score>=3?"Nice work. Glance at the ones you missed once more.":"Good try. Reread the three facts above before bed.";
   document.getElementById("result").hidden=false;
+  setSend(score,QS.length);
   try{localStorage.setItem("nn-"+NOTE_ID,JSON.stringify({score,total:QS.length,at:new Date().toISOString()}));}catch(e){}
 }
 try{const prev=JSON.parse(localStorage.getItem("nn-"+NOTE_ID)||"null");
   if(prev){document.getElementById("result").hidden=false;
     document.getElementById("scoreNum").textContent=`${prev.score}/${prev.total}`;
-    document.getElementById("scoreMsg").textContent="Your last score. Answer again above for another go.";}}catch(e){}
+    document.getElementById("scoreMsg").textContent="Your last score. Answer again above for another go.";
+    setSend(prev.score,prev.total);}}catch(e){}
 </script>
 </body>
 </html>

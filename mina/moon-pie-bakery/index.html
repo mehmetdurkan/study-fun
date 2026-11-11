@@ -49,6 +49,10 @@ button{font:inherit;cursor:pointer;border:0}
 .big{font-size:64px;text-align:center;line-height:1}
 .end p{margin:0;text-align:center}
 .best{font-weight:700;color:#6b5a86;text-align:center}
+.send{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;background:var(--good);color:#fff;font-family:var(--display);font-size:24px;font-weight:800;border-radius:18px;min-height:72px;padding:8px 20px;box-shadow:0 6px 0 #1c7a47}
+.send:active{transform:translateY(4px);box-shadow:0 2px 0 #1c7a47}
+.send:focus-visible{outline:4px solid var(--star);outline-offset:3px}
+.again2{background:transparent;color:var(--crust);box-shadow:none;border:3px solid var(--pie)}
 @media (prefers-reduced-motion:no-preference){.pop{animation:pop .35s ease}@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.05)}100%{transform:scale(1)}}}
 </style>
 </head>
@@ -70,6 +74,9 @@ button{font:inherit;cursor:pointer;border:0}
 const KEY='study-fun:mina:moon-pie-bakery:best';
 function getBest(){try{const v=parseInt(localStorage.getItem(KEY),10);return isNaN(v)?null:v}catch(e){return null}}
 function saveBest(s){try{const b=getBest();if(b===null||s>b)localStorage.setItem(KEY,String(s))}catch(e){}}
+
+// "Send Dad my score": opens Messages with the score typed in. No recipient, no tracking.
+function smsHref(text){const t=encodeURIComponent(text);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
 
 const F=(w,n,d)=>`<span class="frac">${w?w:''}${n?`<span class="f"><span>${n}</span><span>${d}</span></span>`:''}</span>`;
 function pie(filled,parts){
@@ -141,8 +148,9 @@ function end(){
    <div class="big">${score>=3?'🚀':'🥧'}</div><p class="q">${msg}</p>
    <p class="stars" style="color:var(--crust);font-size:34px">${'★'.repeat(score)}${'☆'.repeat(Q.length-score)}</p>
    ${bestLine}
-   <p style="font-weight:800">Tell Dad: “I got ${score} first-try stars!”</p>
-   <button class="go" id="again">Bake again</button></div>`;
+   <a class="send" id="sendScore" href="#">📨 Send Dad my score</a>
+   <button class="go again2" id="again">Bake again</button></div>`;
+  document.getElementById('sendScore').href=smsHref(`Mina here! I got ${score}/${Q.length} stars on Moon Pie Bakery 🎉`);
   document.getElementById('again').onclick=()=>{i=0;score=0;drawStars();show()};
 }
 document.getElementById('start').onclick=show;
