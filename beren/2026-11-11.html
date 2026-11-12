@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beren's Night Notes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* One phone column: hero, one map-ish diagram, 5 flip cards, score */
+:root{
+  --bg:#eef7f4; --card:#ffffff; --fg:#14302a; --muted:#5d7a72;
+  --accent:#0f9d7a; --accent2:#ff8a3d; --good:#1aa37a; --bad:#e0485c; --line:#d5ebe4;
+  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1d1a; --card:#16302a; --fg:#e8f7f2; --muted:#9fc2b8;
+  --accent:#3fd3ab; --accent2:#ffa266; --good:#3ccf9e; --bad:#ff6b7d; --line:#24463e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1d1a; --card:#16302a; --fg:#e8f7f2; --muted:#9fc2b8;
+  --accent:#3fd3ab; --accent2:#ffa266; --good:#3ccf9e; --bad:#ff6b7d; --line:#24463e; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:40px}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.tag{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2)}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+p{margin:0}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--body);fill:var(--fg);font-size:12px}
+.fc{display:flex;flex-direction:column;gap:10px}
+.num{font-family:var(--display);font-size:13px;color:var(--muted)}
+.front{font-weight:800;font-size:18px}
+.flip{font:inherit;font-weight:700;padding:12px;border-radius:12px;border:2px dashed var(--accent);background:transparent;color:var(--accent);cursor:pointer;min-height:48px}
+.back{padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.rate{display:flex;gap:10px}
+.rate button{flex:1;font:inherit;font-weight:700;min-height:48px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
+.rate button.on.yes{border-color:var(--good);background:color-mix(in srgb,var(--good) 15%,transparent)}
+.rate button.on.no{border-color:var(--accent2);background:color-mix(in srgb,var(--accent2) 15%,transparent)}
+.rate button:disabled{cursor:default}
+.score{text-align:center}
+.big{font-family:var(--display);font-size:44px;font-weight:700;color:var(--accent)}
+.send{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;width:100%;min-height:52px;padding:10px 16px;border-radius:14px;text-decoration:none;font-family:var(--display);font-weight:600;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.foot{text-align:center;font-size:13px;color:var(--muted)}
+button:focus-visible,.send:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <div class="tag">AP Human Geo · 2 min · flashcards</div>
+    <h1>How languages travel 🌍</h1>
+    <p>Warm-up for the progress check. Think of the answer, tap to flip, then be honest: did you know it?</p>
+  </section>
+
+  <section class="card" aria-label="Diagram: a language spreading from a colonial power to colonies by relocation">
+    <svg viewBox="0 0 320 150" role="img" aria-label="A colonial power sends its language across the ocean to three colonies">
+      <rect x="0" y="0" width="320" height="150" rx="12" fill="color-mix(in srgb, var(--accent) 10%, transparent)"/>
+      <circle cx="60" cy="75" r="30" fill="var(--accent2)"/>
+      <text x="60" y="72" text-anchor="middle" style="fill:#fff;font-weight:800">Colonial</text>
+      <text x="60" y="86" text-anchor="middle" style="fill:#fff;font-weight:800">power</text>
+      <g stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-dasharray="5 4">
+        <path d="M92 65 Q170 10 240 30"/><path d="M92 75 Q170 75 240 78"/><path d="M92 85 Q170 140 240 125"/>
+      </g>
+      <g fill="var(--accent)"><circle cx="255" cy="30" r="14"/><circle cx="255" cy="78" r="14"/><circle cx="255" cy="125" r="14"/></g>
+      <text x="160" y="146" text-anchor="middle" style="font-size:11px;fill:var(--muted)">Ships carry people + language = relocation diffusion</text>
+    </svg>
+  </section>
+
+  <section id="cards" class="card" style="display:flex;flex-direction:column;gap:22px"></section>
+
+  <section id="result" class="card score" hidden>
+    <div class="big" id="scoreNum">0/5</div>
+    <p id="scoreMsg"></p>
+    <a class="send" id="sendScore" href="#">📲 Send Dad my score</a>
+  </section>
+
+  <p class="foot">Sleep well. Your brain files this away overnight.</p>
+</div>
+
+<script src="../assets/log.js"></script>
+<script>
+const NOTE_ID = "2026-11-11-aphg-language";
+const CARDS = [
+  {f:"Language family → branch → group. Which is the biggest?", b:"The family (like Indo-European). A branch is a big piece of it (Germanic, Romance), and a group is a smaller set of close languages (English, German, Dutch)."},
+  {f:"Why do people in Brazil speak Portuguese and people in most of South America speak Spanish?", b:"Colonialism. Portugal and Spain colonized those lands and brought their languages with settlers, missionaries and government. That's relocation diffusion."},
+  {f:"What is a lingua franca? Give one example.", b:"A shared language people use to talk across different native languages, often for trade. Examples: English today, Swahili in East Africa."},
+  {f:"Pidgin vs. creole: what's the difference?", b:"A pidgin is a simple mixed language for basic contact and has no native speakers. When kids grow up speaking it as their first language, it becomes a creole."},
+  {f:"Many former colonies still use English or French as an official language. Why?", b:"It's a legacy of colonialism. It works as a neutral shared language between many local language groups, and for government, school and business."}
+];
+function smsHref(text){const t=encodeURIComponent(text);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function setSend(score,total){document.getElementById("sendScore").href=smsHref(`Beren here. Knew ${score}/${total} APHG language cards ${score===total?"💯":"🌍"}`)}
+const known = new Array(CARDS.length).fill(null);
+const box = document.getElementById("cards");
+CARDS.forEach((c,i)=>{
+  const el=document.createElement("div"); el.className="fc";
+  el.innerHTML=`<div class="num">Card ${i+1} of ${CARDS.length}</div><p class="front"></p><button class="flip" id="flip${i}">Tap to flip ↻</button><div class="back" hidden></div><div class="rate" hidden><button class="yes" id="yes${i}">✓ I knew it</button><button class="no" id="no${i}">Not yet</button></div>`;
+  el.querySelector(".front").textContent=c.f;
+  const back=el.querySelector(".back"), rate=el.querySelector(".rate"), flip=el.querySelector(".flip");
+  back.textContent=c.b;
+  flip.onclick=()=>{back.hidden=false; rate.hidden=false; flip.hidden=true;};
+  rate.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    if(known[i]!==null) return;
+    known[i]=b.classList.contains("yes");
+    b.classList.add("on"); rate.querySelectorAll("button").forEach(x=>x.disabled=true);
+    if(known.every(x=>x!==null)) finish();
+  });
+  box.appendChild(el);
+});
+function finish(){
+  const score=known.filter(Boolean).length;
+  document.getElementById("scoreNum").textContent=`${score}/${CARDS.length}`;
+  document.getElementById("scoreMsg").textContent= score===CARDS.length?"All five! You're set for the progress check.": score>=3?"Nice. Reread the 'not yet' cards once more before bed.":"Good start. Flip back through the cards one more time.";
+  document.getElementById("result").hidden=false;
+  setSend(score,CARDS.length);
+  if(window.studyLog)studyLog("finish",score,CARDS.length);
+  try{localStorage.setItem("nn-"+NOTE_ID,JSON.stringify({score,total:CARDS.length,at:new Date().toISOString()}));}catch(e){}
+}
+try{const prev=JSON.parse(localStorage.getItem("nn-"+NOTE_ID)||"null");
+  if(prev){document.getElementById("result").hidden=false;
+    document.getElementById("scoreNum").textContent=`${prev.score}/${prev.total}`;
+    document.getElementById("scoreMsg").textContent="Your last score. Go through the cards again for another round.";
+    setSend(prev.score,prev.total);}}catch(e){}
+</script>
+</body>
+</html>
