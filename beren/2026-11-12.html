@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beren's Night Notes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* One phone column: hero, triangle diagram, 5 quick questions, score */
+:root{
+  --bg:#eef7f4; --card:#ffffff; --fg:#14302a; --muted:#5d7a72;
+  --accent:#0f9d7a; --accent2:#ff8a3d; --good:#1aa37a; --bad:#e0485c; --line:#d5ebe4;
+  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1d1a; --card:#16302a; --fg:#e8f7f2; --muted:#9fc2b8;
+  --accent:#3fd3ab; --accent2:#ffa266; --good:#3ccf9e; --bad:#ff6b7d; --line:#24463e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1d1a; --card:#16302a; --fg:#e8f7f2; --muted:#9fc2b8;
+  --accent:#3fd3ab; --accent2:#ffa266; --good:#3ccf9e; --bad:#ff6b7d; --line:#24463e; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:40px}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.tag{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2)}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+p{margin:0}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--body);fill:var(--fg);font-size:12px}
+.fc{display:flex;flex-direction:column;gap:10px}
+.num{font-family:var(--display);font-size:13px;color:var(--muted)}
+.front{font-weight:800;font-size:18px}
+.flip{font:inherit;font-weight:700;padding:12px;border-radius:12px;border:2px dashed var(--accent);background:transparent;color:var(--accent);cursor:pointer;min-height:48px}
+.back{padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.rate{display:flex;gap:10px}
+.rate button{flex:1;font:inherit;font-weight:700;min-height:48px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
+.rate button.on.yes{border-color:var(--good);background:color-mix(in srgb,var(--good) 15%,transparent)}
+.rate button.on.no{border-color:var(--accent2);background:color-mix(in srgb,var(--accent2) 15%,transparent)}
+.rate button:disabled{cursor:default}
+.score{text-align:center}
+.big{font-family:var(--display);font-size:44px;font-weight:700;color:var(--accent)}
+.send{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;width:100%;min-height:52px;padding:10px 16px;border-radius:14px;text-decoration:none;font-family:var(--display);font-weight:600;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.foot{text-align:center;font-size:13px;color:var(--muted)}
+button:focus-visible,.send:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.q{display:flex;flex-direction:column;gap:10px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts button{font:inherit;font-weight:700;text-align:left;min-height:48px;padding:10px 14px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
+.opts button.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 15%,transparent)}
+.opts button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.opts button:disabled{cursor:default}
+.why{padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 12%,transparent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <div class="tag">Geometry · 2 min · quick quiz</div>
+    <h1>Same shape, different size 📐</h1>
+    <p>Warm-up for tomorrow's Unit 6 vocab quiz. Tap an answer and you'll see right away.</p>
+  </section>
+
+  <section class="card" aria-label="Diagram: a small triangle and a bigger triangle with the same angles; sides double">
+    <svg viewBox="0 0 320 150" role="img" aria-label="Small triangle with sides 3, 4, 5 and big triangle with sides 6, 8, 10">
+      <rect x="0" y="0" width="320" height="150" rx="12" fill="color-mix(in srgb, var(--accent) 10%, transparent)"/>
+      <polygon points="30,120 90,120 30,75" fill="var(--accent2)" opacity=".85"/>
+      <text x="58" y="136" text-anchor="middle">4</text><text x="20" y="100" text-anchor="middle">3</text><text x="64" y="92">5</text>
+      <polygon points="150,130 270,130 150,40" fill="var(--accent)" opacity=".85"/>
+      <text x="210" y="146" text-anchor="middle">8</text><text x="138" y="88" text-anchor="middle">6</text><text x="216" y="80">10</text>
+      <text x="200" y="24" text-anchor="middle" style="font-size:11px;fill:var(--muted)">same angles · every side × 2</text>
+    </svg>
+  </section>
+
+  <section id="qs" class="card" style="display:flex;flex-direction:column;gap:22px"></section>
+
+  <section id="result" class="card score" hidden>
+    <div class="big" id="scoreNum">0/5</div>
+    <p id="scoreMsg"></p>
+    <a class="send" id="sendScore" href="#">📲 Send Dad my score</a>
+  </section>
+
+  <p class="foot">Sleep well. Your brain files this away overnight.</p>
+</div>
+
+<script src="../assets/log.js"></script>
+<script>
+const NOTE_ID = "2026-11-12-geo-similar";
+const QS = [
+  {q:"Two figures are similar when…", o:["their angles match and their sides are in the same ratio","they have the same area","all their sides are equal"], a:0,
+   w:"Similar = same shape. Matching angles are equal, and every pair of matching sides has the same ratio."},
+  {q:"In the picture, what's the scale factor from the small triangle to the big one?", o:["2","4","½"], a:0,
+   w:"Each big side ÷ small side: 6÷3 = 8÷4 = 10÷5 = 2."},
+  {q:"A proportion is…", o:["an equation saying two ratios are equal","any fraction","the longest side of a triangle"], a:0,
+   w:"Like 3/6 = 4/8. You can solve one with cross products."},
+  {q:"Solve: x/6 = 4/8. What is x?", o:["3","12","2"], a:0,
+   w:"Cross multiply: 8x = 24, so x = 3."},
+  {q:"Which shortcut proves two triangles similar using only angles?", o:["AA (two pairs of equal angles)","SSS with equal sides","HL"], a:0,
+   w:"If two angles match, the third one must too (they add to 180°), so the shapes are the same."}
+].map(x=>{const order=[0,1,2].sort(()=>Math.random()-.5);return {...x,o:order.map(i=>x.o[i]),a:order.indexOf(x.a)}});
+function smsHref(text){const t=encodeURIComponent(text);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function setSend(score,total){document.getElementById("sendScore").href=smsHref(`Beren here. Got ${score}/${total} on the similar-triangles warm-up ${score===total?"💯":"📐"}`)}
+const got = new Array(QS.length).fill(null);
+const box = document.getElementById("qs");
+QS.forEach((x,i)=>{
+  const el=document.createElement("div"); el.className="q";
+  el.innerHTML=`<div class="num">Question ${i+1} of ${QS.length}</div><p class="front"></p><div class="opts"></div><div class="why" hidden></div>`;
+  el.querySelector(".front").textContent=x.q;
+  const opts=el.querySelector(".opts"), why=el.querySelector(".why");
+  why.textContent=x.w;
+  x.o.forEach((t,j)=>{const b=document.createElement("button"); b.textContent=t;
+    b.onclick=()=>{ if(got[i]!==null) return; got[i]=(j===x.a);
+      opts.querySelectorAll("button").forEach((y,k)=>{y.disabled=true; if(k===x.a) y.classList.add("right");});
+      if(j!==x.a) b.classList.add("wrong");
+      why.hidden=false; if(got.every(v=>v!==null)) finish(); };
+    opts.appendChild(b);});
+  box.appendChild(el);
+});
+function finish(){
+  const score=got.filter(Boolean).length;
+  document.getElementById("scoreNum").textContent=`${score}/${QS.length}`;
+  document.getElementById("scoreMsg").textContent= score===QS.length?"Perfect! You're ready for the vocab quiz.": score>=3?"Nice. Reread the explanations you missed once before bed.":"Good start. Read the explanations again; they're the quiz words.";
+  document.getElementById("result").hidden=false;
+  setSend(score,QS.length);
+  if(window.studyLog)studyLog("finish",score,QS.length);
+  try{localStorage.setItem("nn-"+NOTE_ID,JSON.stringify({score,total:QS.length,at:new Date().toISOString()}));}catch(e){}
+}
+try{const prev=JSON.parse(localStorage.getItem("nn-"+NOTE_ID)||"null");
+  if(prev){document.getElementById("result").hidden=false;
+    document.getElementById("scoreNum").textContent=`${prev.score}/${prev.total}`;
+    document.getElementById("scoreMsg").textContent="Your last score. Try the questions again for another round.";
+    setSend(prev.score,prev.total);}}catch(e){}
+</script>
+</body>
+</html>
