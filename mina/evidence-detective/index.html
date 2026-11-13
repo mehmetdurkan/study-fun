@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Evidence Detective</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: one case card at a time, a case-file tab on top, big stacked answer buttons for iPad taps */
+:root{
+  --bg:#eef3f7; --paper:#ffffff; --ink:#1f2a37; --muted:#5b6b7c;
+  --accent:#2f6fd6; --accent-ink:#ffffff; --clue:#ffd75e; --clue-ink:#3b2e00;
+  --good:#1f9d63; --good-bg:#dcf5e8; --bad:#d4492f; --bad-bg:#fde4de; --line:#cfd9e3;
+  --display:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121a24; --paper:#1c2733; --ink:#eef3f8; --muted:#a3b1c0;
+  --accent:#6aa3ff; --accent-ink:#0b1420; --clue:#e9c24a; --clue-ink:#241b00;
+  --good:#4fd093; --good-bg:#173a2a; --bad:#ff8a73; --bad-bg:#432019; --line:#33414f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121a24; --paper:#1c2733; --ink:#eef3f8; --muted:#a3b1c0;
+  --accent:#6aa3ff; --accent-ink:#0b1420; --clue:#e9c24a; --clue-ink:#241b00;
+  --good:#4fd093; --good-bg:#173a2a; --bad:#ff8a73; --bad-bg:#432019; --line:#33414f; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:max(40px,env(safe-area-inset-bottom,0px))}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.back{color:var(--muted);font-weight:800;text-decoration:none;font-size:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,38px);margin:0;letter-spacing:.2px;text-wrap:balance}
+.stars{font-family:var(--display);font-size:22px;color:var(--muted);font-variant-numeric:tabular-nums}
+.dots{display:flex;gap:8px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--line)}
+.dot.on{background:var(--accent)} .dot.done{background:var(--good)}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:16px;position:relative}
+.tab{align-self:flex-start;background:var(--clue);color:var(--clue-ink);font-family:var(--display);font-weight:600;
+  font-size:15px;letter-spacing:.8px;text-transform:uppercase;padding:4px 12px;border-radius:8px}
+.q{font-family:var(--display);font-weight:600;font-size:clamp(22px,4.6vw,27px);margin:0;text-wrap:balance}
+.claim{border-left:6px solid var(--accent);padding:8px 14px;font-weight:800;background:var(--bg);border-radius:0 10px 10px 0}
+.opts{display:flex;flex-direction:column;gap:12px}
+button{font:inherit;cursor:pointer}
+.opt{min-height:64px;text-align:left;padding:14px 18px;border-radius:14px;border:2px solid var(--line);background:var(--paper);color:var(--ink);font-weight:700;transition:transform .1s}
+.opt:active{transform:scale(.98)}
+.opt:focus-visible,.big:focus-visible,.fo button:focus-visible,.send:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt[disabled]{cursor:default}
+.fo{display:flex;flex-direction:column;gap:12px}
+.fo .row{display:flex;flex-direction:column;gap:8px;padding:12px;border:2px solid var(--line);border-radius:14px}
+.fo .row.right{border-color:var(--good);background:var(--good-bg)}
+.fo .row.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.fo .btns{display:flex;gap:10px}
+.fo .btns button{flex:1;min-height:56px;border-radius:12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);font-weight:800}
+.msg{min-height:28px;font-weight:800}
+.msg.hint{color:var(--bad)} .msg.yay{color:var(--good)}
+.big{min-height:60px;padding:12px 28px;border-radius:14px;border:0;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:600;font-size:22px;align-self:flex-start}
+.end{text-align:center;align-items:center}
+.end .bigstars{font-size:54px;letter-spacing:6px;line-height:1.1}
+.end .tell{font-family:var(--display);font-weight:700;font-size:clamp(30px,7vw,42px);margin:0}
+.send{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;background:var(--good);color:#fff;font-family:var(--display);font-size:24px;font-weight:700;border-radius:18px;min-height:72px;padding:8px 28px;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.send:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.mag{width:64px;height:64px}
+@media (prefers-reduced-motion:reduce){.opt{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p style="margin:0"><a class="back" href="../">← Mina's activities</a></p>
+  <header>
+    <h1>Evidence Detective</h1>
+    <div class="stars" id="score" aria-live="polite">★ 0</div>
+  </header>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <main class="card" id="card"></main>
+</div>
+
+<script src="../../assets/log.js"></script>
+<script>
+// Best score is kept only in this browser (localStorage). assets/log.js sends open/finish + score to Dad's log sheet.
+// "Send Dad my score": opens Messages with the score typed in. No recipient, no tracking.
+function smsHref(text){const t=encodeURIComponent(text);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+
+const cases=[
+ {type:"pick",tab:"Case 1 · Best clue",q:"Which clue best supports this claim?",claim:"Recess should be longer.",
+  opts:["Recess is the best part of the day.","Studies show kids who move and play focus better in class afterward.","My friend likes the swings."],
+  a:1,hint:"Look for a clue with facts, not just what someone likes."},
+ {type:"pick",tab:"Case 2 · Find the claim",q:"Which sentence is the CLAIM (what the writer wants you to believe)?",
+  opts:["The library has over 2,000 books.","Our school should keep the library open after school.","Some kids wait for the bus for 30 minutes."],
+  a:1,hint:"A claim is an opinion the writer argues for. Look for the word \"should\"."},
+ {type:"fo",tab:"Case 3 · Fact or opinion",q:"Tap Fact or Opinion for each clue.",
+  rows:[["The moon takes about 29 days to go through all its phases.","F"],["Pizza is the yummiest food ever.","O"],["Texas became a state in 1845.","F"]],
+  hint:"A fact can be checked in a book. An opinion is how someone feels."},
+ {type:"pick",tab:"Case 4 · Odd clue out",q:"Which clue does NOT help this claim?",claim:"Our class should plant a garden.",
+  opts:["A garden teaches us how plants grow.","We could grow vegetables for the cafeteria.","Tomatoes are red."],
+  a:2,hint:"Good evidence explains WHY. Does that one give a reason?"},
+ {type:"pick",tab:"Case 5 · Stronger evidence",q:"Which evidence is STRONGER?",claim:"Students want a water bottle refill station.",
+  opts:["Lots of people probably want one.","A survey of 100 students found 82 want a refill station.","I think it would be cool."],
+  a:1,hint:"Strong evidence uses numbers or facts you can check."}
+];
+let i=0,stars=0,missed=false;
+const card=document.getElementById("card"),score=document.getElementById("score"),dots=document.getElementById("dots");
+let best=0; try{best=+localStorage.getItem("evidenceBest")||0}catch(e){}
+function drawDots(){dots.innerHTML=cases.map((_,k)=>`<span class="dot ${k<i?'done':k===i?'on':''}"></span>`).join("")}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function render(){
+  drawDots(); missed=false; const c=cases[i];
+  let h=`<span class="tab">${c.tab}</span><p class="q">${esc(c.q)}</p>`;
+  if(c.claim) h+=`<div class="claim">Claim: ${esc(c.claim)}</div>`;
+  if(c.type==="pick") h+=`<div class="opts">${c.opts.map((o,k)=>`<button class="opt" data-k="${k}">${esc(o)}</button>`).join("")}</div>`;
+  else h+=`<div class="fo">${c.rows.map((r,k)=>`<div class="row" data-k="${k}"><div>${esc(r[0])}</div><div class="btns"><button data-v="F">Fact</button><button data-v="O">Opinion</button></div></div>`).join("")}</div>`;
+  h+=`<div class="msg" id="msg" aria-live="polite"></div><button class="big" id="next" hidden>Next case</button>`;
+  card.innerHTML=h;
+  document.getElementById("next").onclick=()=>{i++; i<cases.length?render():finish()};
+  if(c.type==="pick") card.querySelectorAll(".opt").forEach(b=>b.onclick=()=>pick(b,c));
+  else{ let left=c.rows.length;
+    card.querySelectorAll(".row").forEach(row=>row.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      if(row.classList.contains("right"))return;
+      const ok=b.dataset.v===c.rows[+row.dataset.k][1];
+      if(ok){row.classList.remove("wrong");row.classList.add("right");left--; if(left===0)win();}
+      else{row.classList.add("wrong");missed=true;say(c.hint,"hint");}
+    }));}
+}
+function say(t,cls){const m=document.getElementById("msg");m.textContent=t;m.className="msg "+cls}
+function pick(b,c){
+  if(+b.dataset.k===c.a){b.classList.add("right");card.querySelectorAll(".opt").forEach(x=>x.disabled=true);win();}
+  else{b.classList.add("wrong");b.disabled=true;missed=true;say("Hint: "+c.hint,"hint");}
+}
+function win(){
+  if(!missed){stars++;say("Case solved! +1 ★","yay")} else say("Case solved! Nice detective work.","yay");
+  score.textContent="★ "+stars; document.getElementById("next").hidden=false;
+  if(i===cases.length-1) document.getElementById("next").textContent="See my stars";
+}
+function finish(){
+  drawDots(); dots.querySelectorAll(".dot").forEach(d=>d.className="dot done");
+  if(stars>best){best=stars;try{localStorage.setItem("evidenceBest",best)}catch(e){}}
+  if(window.studyLog)studyLog("finish",stars,cases.length);
+  const msg=stars===5?"Master detective! Every case on the first try.":stars>=3?"Great sleuthing! You know good evidence.":"Good work! Detectives get better every case.";
+  card.className="card end";
+  card.innerHTML=`<svg class="mag" viewBox="0 0 64 64" aria-hidden="true"><circle cx="26" cy="26" r="17" fill="none" stroke="var(--accent)" stroke-width="7"/><line x1="39" y1="39" x2="58" y2="58" stroke="var(--clue)" stroke-width="9" stroke-linecap="round"/></svg>
+  <div class="bigstars" style="color:var(--clue)">${"★".repeat(stars)}<span style="color:var(--line)">${"★".repeat(5-stars)}</span></div>
+  <p class="q">${stars} of 5 stars</p><p>${msg}</p>
+  <p class="tell">Tell Dad your stars</p>
+  <a class="send" id="sendScore" href="#">📨 Send Dad my score</a>
+  <p style="color:var(--muted)">Best score so far: ${best} ★</p>
+  <button class="big" id="again" style="align-self:center">Play again</button>`;
+  document.getElementById("sendScore").href=smsHref(`Mina here! I got ${stars}/${cases.length} stars on Evidence Detective 🎉`);
+  document.getElementById("again").onclick=()=>{i=0;stars=0;score.textContent="★ 0";card.className="card";render()};
+}
+render();
+</script>
+</body>
+</html>
