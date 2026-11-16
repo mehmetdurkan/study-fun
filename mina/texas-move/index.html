@@ -45,6 +45,12 @@ button.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
 .fb{margin:0;font-weight:700;min-height:1.4em}
 .next,.send{font:inherit;font-family:var(--display);font-size:22px;font-weight:700;border:0;border-radius:18px;padding:16px;background:var(--accent);color:var(--accent-ink);text-align:center;text-decoration:none;cursor:pointer}
 .next[hidden]{display:none}
+.ask{font-family:var(--display);font-size:22px;font-weight:600;margin:0}
+.choice{display:flex;flex-direction:column;gap:12px}
+.choice button{font:inherit;font-family:var(--display);font-size:24px;font-weight:700;min-height:64px;border-radius:18px;border:0;cursor:pointer}
+.yes{background:var(--sun);color:var(--sun-ink)}
+.no{background:var(--paper);color:var(--ink);border:2px solid var(--line)!important}
+.choice button:focus-visible{outline:4px solid var(--accent);outline-offset:2px}
 .talk{background:var(--paper);border:2px dashed var(--line);border-radius:18px;padding:16px}
 .talk h2{font-family:var(--display);font-size:20px;margin:0 0 6px}
 .talk p{margin:0}
@@ -78,20 +84,46 @@ const Q=[
   o:['Happy and thankful','Upset and angry','They didn\'t notice'],a:1,
   why:'Good thinking! Many settlers were upset. That anger grew into the Texas Revolution a few years later.'}
 ];
-let i=0,score=0;
+const B=[
+ {tag:'Bonus: Before 1825',scene:'🇪🇸➡️🇲🇽',q:'In 1821, Mexico became free. Which country used to rule Mexico and Texas?',
+  o:['England','Spain','France'],a:1,
+  why:'Yes! Mexico won its independence from Spain in 1821, so Texas became part of Mexico.'},
+ {tag:'Bonus: The first plan',scene:'👨‍👦📜',q:'Stephen F. Austin took over a plan to bring settlers to Texas. Who started that plan?',
+  o:['His father, Moses Austin','The king of Spain','A ship captain'],a:0,
+  why:'Right! Moses Austin got permission first, but he died in 1821, so his son Stephen carried on.'},
+ {tag:'Bonus: A famous name',scene:'👨‍👩‍👧‍👦×300',q:'Austin\'s first group of settler families got a special nickname. What was it?',
+  o:['The Lone Stars','The Old Three Hundred','The Trail Riders'],a:1,
+  why:'Yes! About 300 families came first, so they are called the Old Three Hundred.'},
+ {tag:'Bonus: Where?',scene:'🏞️💧',q:'Austin\'s colony was along two big Texas rivers. Which ones?',
+  o:['The Brazos and the Colorado','The Mississippi and the Ohio','The Nile and the Amazon'],a:0,
+  why:'Correct! Rivers gave the farms water and a way to move goods.'},
+ {tag:'Bonus: On the farm',scene:'🌱🧺',q:'Many settler farmers grew one crop to sell for money. What was it?',
+  o:['Bananas','Cotton','Coffee'],a:1,
+  why:'Yes! Cotton grew well in Texas soil and was sold far away.'}
+];
+let round='main',list=Q,i=0,score=0,mainScore=0;
 const card=document.getElementById('card'),trail=document.getElementById('trail'),stars=document.getElementById('stars');
-function drawTrail(){trail.innerHTML=Q.map((_,k)=>`<span class="step ${k<i?'done':k===i?'on':''}"></span>`).join('')+'<span aria-hidden="true">🏠</span>'}
+function drawTrail(){trail.innerHTML=list.map((_,k)=>`<span class="step ${k<i?'done':k===i?'on':''}"></span>`).join('')+'<span aria-hidden="true">🏠</span>'}
 function smsHref(t){t=encodeURIComponent(t);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function log(e,s,t){if(window.studyLog)studyLog(e,s,t)}
+function sendBtn(text){return `<a class="send" href="${smsHref(text)}">Send Dad my score</a>`}
+function mainEnd(){
+  mainScore=score;log('finish',score,Q.length);
+  try{localStorage.setItem('texasTrailBest',Math.max(score,+localStorage.getItem('texasTrailBest')||0))}catch(e){}
+  card.innerHTML=`<span class="tag">You made it!</span><p class="q">You got ${score} of ${Q.length} stars! ${score>=4?'🌟 Texas history pro!':'🐴 Nice ride, trailblazer!'}</p><p class="ask">Want 5 bonus questions?</p><div class="choice"><button class="yes" id="yes">Yes, more! 🚀</button><button class="no" id="no">I'm done</button></div>`;
+  document.getElementById('yes').onclick=()=>{log('extra_yes');round='bonus';list=B;i=0;score=0;stars.textContent='⭐ 0';show()};
+  document.getElementById('no').onclick=()=>{log('extra_no');
+    card.innerHTML=`<span class="tag">All done!</span><p class="q">You got ${mainScore} of ${Q.length} stars! Great job today 🤠</p>`+sendBtn(`Mina here! I got ${mainScore}/${Q.length} stars on Texas Trail 1825 🎉`)};
+  document.getElementById('yes').focus();
+}
+function bonusEnd(){
+  log('extra_finish',score,B.length);
+  card.innerHTML=`<span class="tag">Bonus done!</span><p class="q">Bonus round: ${score} of ${B.length} stars! ${score>=4?'🏆 Super trailblazer!':'💪 Way to keep going!'}</p><p class="intro">Main trail: ${mainScore} of ${Q.length}</p>`+sendBtn(`Mina here! I got ${mainScore}/${Q.length} on Texas Trail 1825 and ${score}/${B.length} on the bonus round 🎉`);
+}
 function show(){
   drawTrail();
-  if(i>=Q.length){
-    card.innerHTML=`<span class="tag">You made it!</span><p class="q">You got ${score} of ${Q.length} stars! ${score>=4?'🌟 Texas history pro!':'🐴 Nice ride, trailblazer!'}</p><a class="send" id="sendScore" href="#">Send Dad my score</a>`;
-    document.getElementById('sendScore').href=smsHref(`Mina here! I got ${score}/${Q.length} stars on Texas Trail 1825 🎉`);
-    if(window.studyLog)studyLog('finish',score,Q.length);
-    try{localStorage.setItem('texasTrailBest',Math.max(score,+localStorage.getItem('texasTrailBest')||0))}catch(e){}
-    return;
-  }
-  const x=Q[i];
+  if(i>=list.length){return round==='main'?mainEnd():bonusEnd()}
+  const x=list[i];
   card.innerHTML=`<span class="tag">${x.tag}</span><div class="scene" aria-hidden="true">${x.scene}</div><p class="q">${x.q}</p><div class="opts">${x.o.map((t,k)=>`<button class="opt" data-k="${k}">${t}</button>`).join('')}</div><p class="fb" id="fb" aria-live="polite"></p><button class="next" id="next" hidden>Next ➜</button>`;
   let done=false,first=true;
   card.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
