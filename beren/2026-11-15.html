@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beren's Night Notes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* One phone column: hero, spelling-rule diagram, 5 "fix the spelling" taps, score */
+:root{
+  --bg:#fff4ec; --card:#ffffff; --fg:#33201a; --muted:#7b6259;
+  --accent:#e2543b; --accent2:#f2a33a; --good:#1aa37a; --bad:#c43a52; --line:#f1ddd1;
+  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1e1310; --card:#2b1c17; --fg:#f8ebe5; --muted:#c9ada2;
+  --accent:#ff7a61; --accent2:#ffbe5c; --good:#3ccf9e; --bad:#ff6b7d; --line:#45302a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1e1310; --card:#2b1c17; --fg:#f8ebe5; --muted:#c9ada2;
+  --accent:#ff7a61; --accent2:#ffbe5c; --good:#3ccf9e; --bad:#ff6b7d; --line:#45302a; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding:max(20px,env(safe-area-inset-top,0px)) 16px 40px}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.tag{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2)}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+p{margin:0}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--body);fill:var(--fg);font-size:13px}
+.q{display:flex;flex-direction:column;gap:10px}
+.num{font-family:var(--display);font-size:13px;color:var(--muted)}
+.prompt{font-weight:800;font-size:18px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button{flex:1 1 30%;font:inherit;font-weight:800;font-size:18px;min-height:52px;padding:10px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
+.opts button.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 15%,transparent)}
+.opts button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.opts button:disabled{cursor:default}
+.why{padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.score{text-align:center}
+.big{font-family:var(--display);font-size:44px;font-weight:700;color:var(--accent)}
+.send{display:inline-flex;align-items:center;justify-content:center;margin-top:6px;width:100%;min-height:52px;padding:10px 16px;border-radius:14px;text-decoration:none;font-family:var(--display);font-weight:600;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.foot{text-align:center;font-size:13px;color:var(--muted)}
+button:focus-visible,.send:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <span class="tag">Spanish · 2-minute game</span>
+    <h1>Fix the spelling 🌙</h1>
+    <p>Some preterite verbs change spelling to keep the same sound. Tap the right form. 5 quick ones, then sleep.</p>
+  </section>
+  <section class="card">
+    <svg viewBox="0 0 340 150" role="img" aria-label="Spelling rule: in the yo form, -car becomes -qué, -gar becomes -gué, -zar becomes -cé. Between vowels, i becomes y in the él and ellos forms.">
+      <rect x="4" y="6" width="332" height="86" rx="12" fill="none" stroke="currentColor" stroke-opacity=".25"/>
+      <text x="16" y="28" font-weight="800">yo form only:</text>
+      <text x="16" y="52">-car → <tspan font-weight="800" fill="#e2543b">-qué</tspan></text>
+      <text x="126" y="52">-gar → <tspan font-weight="800" fill="#e2543b">-gué</tspan></text>
+      <text x="236" y="52">-zar → <tspan font-weight="800" fill="#e2543b">-cé</tspan></text>
+      <text x="16" y="78" fill-opacity=".75">(busqué · llegué · empecé)</text>
+      <rect x="4" y="100" width="332" height="44" rx="12" fill="none" stroke="currentColor" stroke-opacity=".25"/>
+      <text x="16" y="127">vowel + -er/-ir: <tspan font-weight="800" fill="#e2543b">i → y</tspan> in él / ellos (leyó)</text>
+    </svg>
+  </section>
+  <section class="card q" id="game"></section>
+  <section class="card score" id="done" hidden>
+    <div class="big" id="big"></div>
+    <p id="msg"></p>
+    <a class="send" id="sendScore" href="#">Send Dad my score</a>
+  </section>
+  <p class="foot">Review only. Good luck on the quiz tomorrow!</p>
+</div>
+<script src="../assets/log.js"></script>
+<script>
+const Q=[
+ {p:'tocar, yo (I played)',o:['tocé','toqué','tocó'],a:1,why:'-car → -qué in the yo form, so the c sound stays hard: toqué.'},
+ {p:'pagar, yo (I paid)',o:['pagé','pagó','pagué'],a:2,why:'-gar → -gué: the u keeps the hard g sound. pagué.'},
+ {p:'almorzar, yo (I ate lunch)',o:['almorcé','almorzé','almorzó'],a:0,why:'-zar → -cé. Spanish rarely writes z before e. almorcé.'},
+ {p:'leer, ella (she read)',o:['leió','leyó','leó'],a:1,why:'Vowel + -er: the i between two vowels becomes y. leyó.'},
+ {p:'jugar, él (he played)',o:['jugó','jugué','juguó'],a:0,why:'Trick! The spelling change is only in yo. Él stays regular: jugó.'}
+];
+let i=0,score=0;const g=document.getElementById('game');
+function smsHref(t){t=encodeURIComponent(t);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function show(){
+  if(i>=Q.length){g.hidden=true;const d=document.getElementById('done');d.hidden=false;
+    document.getElementById('big').textContent=`${score}/${Q.length}`;
+    document.getElementById('msg').textContent=score>=4?'¡Excelente! You know the rule.':'Nice practice. Look at the rule box once more before bed.';
+    document.getElementById('sendScore').href=smsHref(`Beren here: ${score}/${Q.length} on tonight's Spanish spelling game`);
+    if(window.studyLog)studyLog('finish',score,Q.length);
+    try{localStorage.setItem('nn-2026-11-15',score)}catch(e){}return}
+  const x=Q[i];
+  g.innerHTML=`<span class="num">${i+1} of ${Q.length}</span><p class="prompt">${x.p}</p><div class="opts">${x.o.map((t,k)=>`<button data-k="${k}">${t}</button>`).join('')}</div><p class="why" id="why" hidden></p>`;
+  g.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.k;g.querySelectorAll('.opts button').forEach(z=>z.disabled=true);
+    g.querySelector(`[data-k="${x.a}"]`).classList.add('right');
+    if(k===x.a)score++;else b.classList.add('wrong');
+    const w=document.getElementById('why');w.hidden=false;w.textContent=(k===x.a?'✅ ':'Almost! ')+x.why;
+    setTimeout(()=>{i++;show()},1800);
+  });
+}
+show();
+</script>
+</body>
+</html>
