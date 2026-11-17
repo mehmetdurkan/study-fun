@@ -6,7 +6,7 @@
 // Friends: a link with ?who=NAME (first name only) logs as kid "friend-NAME", says
 // "Hi Name!" on the page, and remembers NAME on that device (localStorage, per folder:
 // mina/ or beren/) so later plain links there still log as that friend. ?who=reset (or ?who=mina / ?who=beren)
-// forgets it. With no saved name and no ?who, nothing changes.
+// forgets it (that visit logs no open row). With no saved name and no ?who, nothing changes.
 (function(){
   var URL = 'https://script.google.com/macros/s/AKfycbxR4LNhRuWGWF62GkCftSlAQhIM43bVFnkBczcJoYNNGIRmjixRORIeOTxSonpYKsM3/exec';
   var KIDS = ['beren','mina'];
@@ -32,7 +32,9 @@
   if(q!=null){
     var c = clean(q);
     if(RESET.indexOf(c)>=0 || RESET.indexOf(String(q).trim().toLowerCase())>=0){
-      store(function(s){ s.removeItem(KEY); });
+      // Forget the friend in every folder. This visit is upkeep, so it sends no open row.
+      store(function(s){ KIDS.forEach(function(k){ s.removeItem('studyFriend-'+k); }); });
+      var resetVisit = true;
     }else if(c){
       who = c; store(function(s){ s.setItem(KEY, c); });
     }else{
@@ -59,7 +61,7 @@
     try{ fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,body:body}); }catch(e){}
   }
   window.studyLog = send;
-  send('open');
+  if(!resetVisit) send('open');
 
   if(!who || !kid) return;
 
