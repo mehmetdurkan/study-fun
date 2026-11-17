@@ -55,3 +55,7 @@ https://mehmetdurkan.github.io/study-fun/mina/<page>/?who=FIRSTNAME
 - The "Study pages log" web app accepts kid values matching `^friend-[a-z-]{1,20}$` (since Nov 17, deployment version 2, same URL). Names with letters outside a-z (e.g. accents) are rejected there, so use a plain a-z spelling in `?who=`.
 - Plain links on a device with no saved name behave exactly as before. Pages need no changes; keep building them the same way. `window.studyWho` is `{name, kid}` for a friend visit, otherwise `null`, if a page wants to say the friend's name itself.
 - Never put full names or contact details in a link.
+
+## Activities lists (`beren/index.html`, `mina/index.html`)
+
+Every new page, including the Mac's nightly notes (`beren/YYYY-MM-DD.html`) and weekly pages (`mina/YYYY-MM-DD.html`), gets a card on its folder's `index.html`, newest first, in the same style as the cards already there. Beren's nightly notes were missing from `beren/index.html` until Nov 17, so add each new one there too.
