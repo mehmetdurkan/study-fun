@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beren's Night Notes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* One phone column: hero, PMAT cheat sheet, 10 one-tap questions with Next, score */
+:root{
+  --bg:#fff4ec; --card:#ffffff; --fg:#33201a; --muted:#7b6259;
+  --accent:#e2543b; --accent2:#f2a33a; --good:#1aa37a; --bad:#c43a52; --line:#f1ddd1;
+  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1e1310; --card:#2b1c17; --fg:#f8ebe5; --muted:#c9ada2;
+  --accent:#ff7a61; --accent2:#ffbe5c; --good:#3ccf9e; --bad:#ff6b7d; --line:#45302a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1e1310; --card:#2b1c17; --fg:#f8ebe5; --muted:#c9ada2;
+  --accent:#ff7a61; --accent2:#ffbe5c; --good:#3ccf9e; --bad:#ff6b7d; --line:#45302a; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding:max(20px,env(safe-area-inset-top,0px)) 16px 40px}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.tag{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2)}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+p{margin:0}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--body);fill:var(--fg);font-size:13px}
+.q{display:flex;flex-direction:column;gap:10px}
+.num{font-family:var(--display);font-size:13px;color:var(--muted)}
+.prompt{font-weight:800;font-size:18px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts{flex-direction:column}
+.opts button{text-align:left;font:inherit;font-weight:700;font-size:16px;min-height:52px;padding:10px 14px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
+.opts button.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 15%,transparent)}
+.opts button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.opts button:disabled{cursor:default}
+.why{padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.score{text-align:center}
+.big{font-family:var(--display);font-size:44px;font-weight:700;color:var(--accent)}
+.send{display:inline-flex;align-items:center;justify-content:center;margin-top:6px;width:100%;min-height:52px;padding:10px 16px;border-radius:14px;text-decoration:none;font-family:var(--display);font-weight:600;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.next{font:inherit;font-family:var(--display);font-weight:600;font-size:18px;min-height:52px;border:0;border-radius:14px;color:#fff;background:var(--accent);cursor:pointer}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent2);transition:width .2s}
+.foot{text-align:center;font-size:13px;color:var(--muted)}
+button:focus-visible,.send:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <span class="tag">Biology · mini quiz</span>
+    <h1>Mitosis vs. Meiosis: the steps 🧬</h1>
+    <p>10 quick questions on what happens in each phase. Peek at the cheat sheet first, then go.</p>
+  </section>
+  <section class="card">
+    <svg viewBox="0 0 340 196" role="img" aria-label="Cheat sheet. Both use the order prophase, metaphase, anaphase, telophase. Mitosis runs it once and makes 2 identical diploid cells. Meiosis runs it twice and makes 4 different haploid cells. Meiosis one separates homologous pairs. Meiosis two separates sister chromatids.">
+      <text x="8" y="18" font-weight="800">Same order every time:</text>
+      <g font-weight="800" text-anchor="middle">
+        <rect x="8" y="28" width="74" height="30" rx="8" fill="#e2543b" fill-opacity=".14" stroke="#e2543b"/><text x="45" y="48">Pro</text>
+        <rect x="90" y="28" width="74" height="30" rx="8" fill="#e2543b" fill-opacity=".14" stroke="#e2543b"/><text x="127" y="48">Meta</text>
+        <rect x="172" y="28" width="74" height="30" rx="8" fill="#e2543b" fill-opacity=".14" stroke="#e2543b"/><text x="209" y="48">Ana</text>
+        <rect x="254" y="28" width="78" height="30" rx="8" fill="#e2543b" fill-opacity=".14" stroke="#e2543b"/><text x="293" y="48">Telo</text>
+      </g>
+      <text x="8" y="76" fill-opacity=".75">prepare · middle · apart · two nuclei</text>
+      <rect x="4" y="88" width="332" height="46" rx="12" fill="none" stroke="currentColor" stroke-opacity=".25"/>
+      <text x="16" y="108"><tspan font-weight="800">Mitosis:</tspan> PMAT once</text>
+      <text x="16" y="126">→ 2 identical cells, diploid (2n)</text>
+      <rect x="4" y="142" width="332" height="50" rx="12" fill="none" stroke="currentColor" stroke-opacity=".25"/>
+      <text x="16" y="162"><tspan font-weight="800">Meiosis:</tspan> PMAT twice (I, then II)</text>
+      <text x="16" y="180">→ 4 different cells, haploid (n)</text>
+    </svg>
+  </section>
+  <section class="card q" id="game"></section>
+  <section class="card score" id="done" hidden>
+    <div class="big" id="big"></div>
+    <p id="msg"></p>
+    <a class="send" id="sendScore" href="#">Send Dad my score</a>
+  </section>
+  <p class="foot">Review only, in plain words. You've got this!</p>
+</div>
+<script src="../assets/log.js"></script>
+<script>
+const Q=[
+ {p:'What is the correct order of the phases?',o:['Metaphase → Prophase → Telophase → Anaphase','Prophase → Metaphase → Anaphase → Telophase','Prophase → Anaphase → Metaphase → Telophase'],a:1,why:'PMAT: Prophase, Metaphase, Anaphase, Telophase. Both mitosis and meiosis use this order.'},
+ {p:'Chromosomes condense, the nuclear envelope breaks down and the spindle starts to form. Which phase?',o:['Prophase','Anaphase','Telophase'],a:0,why:'Prophase is the "prepare" phase: chromosomes become visible and the spindle forms.'},
+ {p:'Mitosis: chromosomes line up single file across the middle of the cell. Which phase?',o:['Telophase','Prophase','Metaphase'],a:2,why:'Metaphase = Middle. In mitosis each chromosome lines up on its own.'},
+ {p:'Mitosis, anaphase: what gets pulled apart?',o:['Homologous pairs','Sister chromatids','Whole nuclei'],a:1,why:'Anaphase = Apart. In mitosis the sister chromatids separate and move to opposite poles.'},
+ {p:'What does mitosis make in the end?',o:['2 identical diploid cells','4 different haploid cells','2 different haploid cells'],a:0,why:'One division gives 2 cells that match the parent cell (2n). It is for growth and repair.'},
+ {p:'Crossing over (homologous chromosomes swap pieces) happens in…',o:['Metaphase II','Prophase I','Anaphase of mitosis'],a:1,why:'Prophase I: homologous chromosomes pair up and trade segments. That is a big source of variation.'},
+ {p:'How is metaphase I different from metaphase in mitosis?',o:['Chromosomes line up in homologous PAIRS','There is no spindle','Chromosomes are not condensed'],a:0,why:'In metaphase I the pairs line up side by side. In mitosis (and metaphase II) they line up single file.'},
+ {p:'Anaphase I: what separates?',o:['Sister chromatids','Homologous chromosomes','Nothing yet'],a:1,why:'Meiosis I splits the homologous pairs. The sister chromatids stay joined until meiosis II.'},
+ {p:'Anaphase II: what separates?',o:['Homologous chromosomes','The two daughter cells','Sister chromatids'],a:2,why:'Meiosis II looks like mitosis: the sister chromatids finally come apart.'},
+ {p:'Is DNA copied again between meiosis I and meiosis II?',o:['Yes, every division needs a copy','No, it is copied only once, before meiosis I','Only in some chromosomes'],a:1,why:'One copy, two divisions. That is why the 4 cells end up haploid (n), each one different.'}
+];
+let i=0,score=0;const g=document.getElementById('game');
+function smsHref(t){t=encodeURIComponent(t);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function show(){
+  if(i>=Q.length){g.hidden=true;const d=document.getElementById('done');d.hidden=false;
+    document.getElementById('big').textContent=`${score}/${Q.length}`;
+    document.getElementById('msg').textContent=score>=8?'Excellent! You know the steps.':score>=6?'Good work. Re-read the ones you missed, then try again tomorrow.':'Nice practice. Look at the cheat sheet once more and replay it.';
+    document.getElementById('sendScore').href=smsHref(`Beren here: ${score}/${Q.length} on the mitosis vs. meiosis mini quiz`);
+    if(window.studyLog)studyLog('finish',score,Q.length);
+    try{localStorage.setItem('nn-2026-11-16',score)}catch(e){}return}
+  const x=Q[i];
+  g.innerHTML=`<div class="bar"><i style="width:${i/Q.length*100}%"></i></div><span class="num">${i+1} of ${Q.length}</span><p class="prompt">${x.p}</p><div class="opts">${x.o.map((t,k)=>`<button data-k="${k}">${t}</button>`).join('')}</div><p class="why" id="why" hidden></p><button class="next" id="next" hidden>${i===Q.length-1?'See my score':'Next ➜'}</button>`;
+  g.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.k;g.querySelectorAll('.opts button').forEach(z=>z.disabled=true);
+    g.querySelector(`.opts [data-k="${x.a}"]`).classList.add('right');
+    if(k===x.a)score++;else b.classList.add('wrong');
+    const w=document.getElementById('why');w.hidden=false;w.textContent=(k===x.a?'✅ ':'Not quite. ')+x.why;
+    const n=document.getElementById('next');n.hidden=false;n.focus();
+  });
+  document.getElementById('next').onclick=()=>{i++;show();window.scrollTo({top:g.offsetTop-12,behavior:'smooth'})};
+}
+show();
+</script>
+</body>
+</html>
