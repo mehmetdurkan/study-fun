@@ -56,6 +56,18 @@ https://mehmetdurkan.github.io/study-fun/mina/<page>/?who=FIRSTNAME
 - Plain links on a device with no saved name behave exactly as before. Pages need no changes; keep building them the same way. `window.studyWho` is `{name, kid}` for a friend visit, otherwise `null`, if a page wants to say the friend's name itself.
 - Never put full names or contact details in a link.
 
-## Activities lists (`beren/index.html`, `mina/index.html`)
+## Activities lists (`mina/index.html`, `beren/index.html`)
 
-Every new page, including the Mac's nightly notes (`beren/YYYY-MM-DD.html`) and weekly pages (`mina/YYYY-MM-DD.html`), gets a card on its folder's `index.html`, newest first, in the same style as the cards already there. Beren's nightly notes were missing from `beren/index.html` until Nov 17, so add each new one there too.
+**Mina: do not edit `mina/index.html`.** It builds itself from `mina/pages.js`. To add a page, add one line at the top of the list in `mina/pages.js`:
+
+```js
+  {url:'2026-11-18.html', title:'Fraction Race', subject:'math', date:'2026-11-18', blurb:'5 quick fraction puzzles'},
+```
+
+- `url`: the page inside `mina/` (`some-page/` or `YYYY-MM-DD.html`). `title`: the card name. `date`: the day it goes live, Central time. `blurb`: optional, one short line.
+- `subject` is one of `math`, `science`, `reading`, `writing`, `social`. It picks the icon and the subject filter (Reading and Writing share one filter).
+- The list shows the newest page as a big card, the rest of this week (Mon to Sun, Central) as tiles, and older weeks folded by week. Subject buttons show every page in that subject.
+- Check marks come from `log.js`: when a page calls `studyLog('finish', ...)`, the device remembers it in localStorage `studyDone`. Nothing extra goes to the sheet.
+- The list loads `../assets/log.js` with `data-nolog`, so it greets friends and remembers `?who=` but sends no rows.
+
+**Beren:** every new page, including the Mac's nightly notes (`beren/YYYY-MM-DD.html`), still gets a card added by hand on `beren/index.html`, newest first, in the same style as the cards there.

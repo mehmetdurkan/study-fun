@@ -1,6 +1,8 @@
 // Study pages log: tells Dad's own Google Sheet that a page was opened or finished.
 // Sends only {kid, page, event, score, total}. No cookies, no IDs, no third-party analytics.
 // Usage: <script src="../../assets/log.js"></script>  then  studyLog('finish', score, total)
+// List pages: <script src="../assets/log.js" data-nolog></script> sends nothing, only greets friends.
+// A 'finish' also saves {"kid/page": time} in localStorage 'studyDone' for the list's check marks.
 // Bonus round: studyLog('extra_yes') / studyLog('extra_no') / studyLog('extra_finish', score, total)
 //
 // Friends: a link with ?who=NAME (first name only) logs as kid "friend-NAME", says
@@ -8,6 +10,7 @@
 // so later plain links there still log as that friend. ?who=reset (or ?who=mina / ?who=beren)
 // forgets it (that visit logs no open row). With no saved name and no ?who, nothing changes.
 (function(){
+  var NOLOG = !!(document.currentScript && document.currentScript.hasAttribute('data-nolog'));
   var URL = 'https://script.google.com/macros/s/AKfycbxR4LNhRuWGWF62GkCftSlAQhIM43bVFnkBczcJoYNNGIRmjixRORIeOTxSonpYKsM3/exec';
   var KIDS = ['beren','mina'];
   var parts = location.pathname.replace(/\/index\.html$/,'').split('/').filter(Boolean);
@@ -61,6 +64,9 @@
   var EXTRA = {extra_yes:['open','#extra-yes'], extra_no:['open','#extra-no'], extra_finish:['finish','#extra']};
   function send(event, score, total){
     if(!kid || URL.indexOf('https://')!==0) return;
+    // Remember on this device that the page was finished (check marks on the activities list).
+    if(event==='finish') store(function(s){ var d={}; try{ d=JSON.parse(s.getItem('studyDone')||'{}')||{}; }catch(e){}
+      d[kid+'/'+page]=Date.now(); s.setItem('studyDone', JSON.stringify(d)); });
     var pg = page, x = EXTRA[event];
     if(x){ event = x[0]; pg = page.slice(0,70) + x[1]; }
     var body = new URLSearchParams({kid:logKid, page:pg.slice(0,80), event:event,
@@ -69,7 +75,7 @@
     try{ fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,body:body}); }catch(e){}
   }
   window.studyLog = send;
-  if(!resetVisit) send('open');
+  if(!resetVisit && !NOLOG) send('open');
 
   if(!who || !kid) return;
 
