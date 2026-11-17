@@ -39,3 +39,18 @@ if(window.studyLog)studyLog('finish', score, total);
 ```
 
 The open event is sent automatically on load.
+
+## Friend links (`?who=`)
+
+Friends can use any page with their own link, so their scores don't mix into the girls' numbers:
+
+```
+https://mehmetdurkan.github.io/study-fun/mina/<page>/?who=FIRSTNAME
+```
+
+- `log.js` logs that visit as kid `friend-firstname` (first name only, letters and hyphen, max 20, lowercased; anything else is ignored and the page logs as usual).
+- The page shows a small "Hi Firstname! 👋" badge, the score button reads "Send my score", and its text starts "Firstname here!" instead of "Mina here!" / "Beren here.". This works on existing pages with no page changes, as long as the score text starts with "Mina here" / "Beren here".
+- The name is saved on that device (localStorage, per folder), so later plain links there still log as the friend. A new `?who=` replaces it.
+- To clear it (for example if a friend's link was opened on Mina's iPad): open any page with `?who=reset` (or `?who=mina` / `?who=beren`).
+- Plain links on a device with no saved name behave exactly as before. Pages need no changes; keep building them the same way. `window.studyWho` is `{name, kid}` for a friend visit, otherwise `null`, if a page wants to say the friend's name itself.
+- Never put full names or contact details in a link.
