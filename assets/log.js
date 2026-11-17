@@ -4,8 +4,8 @@
 // Bonus round: studyLog('extra_yes') / studyLog('extra_no') / studyLog('extra_finish', score, total)
 //
 // Friends: a link with ?who=NAME (first name only) logs as kid "friend-NAME", says
-// "Hi Name!" on the page, and remembers NAME on that device (localStorage, per folder:
-// mina/ or beren/) so later plain links there still log as that friend. ?who=reset (or ?who=mina / ?who=beren)
+// "Hi Name!" on the page, and remembers NAME on that device (localStorage, shared by mina/ and beren/)
+// so later plain links there still log as that friend. ?who=reset (or ?who=mina / ?who=beren)
 // forgets it (that visit logs no open row). With no saved name and no ?who, nothing changes.
 (function(){
   var URL = 'https://script.google.com/macros/s/AKfycbxR4LNhRuWGWF62GkCftSlAQhIM43bVFnkBczcJoYNNGIRmjixRORIeOTxSonpYKsM3/exec';
@@ -16,7 +16,7 @@
   var page = i>=0 ? (parts.slice(i+1).join('/').replace(/\.html$/,'') || 'index') : '';
 
   // ---- friend name (?who=) ----
-  var KEY = 'studyFriend-'+kid, RESET = ['reset','clear','me','none'].concat(KIDS);
+  var KEY = 'studyFriend', RESET = ['reset','clear','me','none'].concat(KIDS);
   function clean(raw){
     if(raw==null) return '';
     var w = String(raw).trim().split(/\s+/)[0] || '';
@@ -26,6 +26,14 @@
     return w.toLowerCase().slice(0,20).replace(/-+$/,'');
   }
   function store(fn){ try{ return fn(window.localStorage); }catch(e){ return null; } }
+  // One name for both folders. Older devices saved it per folder (studyFriend-mina / -beren).
+  function saved(){
+    return clean(store(function(s){
+      var v = s.getItem(KEY); if(v) return v;
+      for(var k=0;k<KIDS.length;k++){ v = s.getItem(KEY+'-'+KIDS[k]); if(v){ s.setItem(KEY, v); return v; } }
+      return null;
+    }));
+  }
   var who = '';
   var q = null;
   try{ q = new URLSearchParams(location.search).get('who'); }catch(e){}
@@ -33,15 +41,15 @@
     var c = clean(q);
     if(RESET.indexOf(c)>=0 || RESET.indexOf(String(q).trim().toLowerCase())>=0){
       // Forget the friend in every folder. This visit is upkeep, so it sends no open row.
-      store(function(s){ KIDS.forEach(function(k){ s.removeItem('studyFriend-'+k); }); });
+      store(function(s){ s.removeItem(KEY); KIDS.forEach(function(k){ s.removeItem(KEY+'-'+k); }); });
       var resetVisit = true;
     }else if(c){
-      who = c; store(function(s){ s.setItem(KEY, c); });
+      who = c; store(function(s){ s.setItem(KEY, c); KIDS.forEach(function(k){ s.removeItem(KEY+'-'+k); }); });
     }else{
-      who = clean(store(function(s){ return s.getItem(KEY); }));
+      who = saved();
     }
   }else{
-    who = clean(store(function(s){ return s.getItem(KEY); }));
+    who = saved();
     if(RESET.indexOf(who)>=0) who = '';
   }
   var display = who ? who.split('-').map(function(p){return p.charAt(0).toUpperCase()+p.slice(1)}).join('-') : '';

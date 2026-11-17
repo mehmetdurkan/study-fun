@@ -50,7 +50,7 @@ https://mehmetdurkan.github.io/study-fun/mina/<page>/?who=FIRSTNAME
 
 - `log.js` logs that visit as kid `friend-firstname` (first name only, letters and hyphen, max 20, lowercased; anything else is ignored and the page logs as usual).
 - The page shows a small "Hi Firstname! 👋" badge, the score button reads "Send my score", and its text starts "Firstname here!" instead of "Mina here!" / "Beren here.". This works on existing pages with no page changes, as long as the score text starts with "Mina here" / "Beren here".
-- The name is saved on that device (localStorage, per folder), so later plain links there still log as the friend. A new `?who=` replaces it.
+- The name is saved on that device (localStorage, one name for both `mina/` and `beren/`), so later plain links there, in either folder, still log as the friend. A new `?who=` replaces it.
 - To clear it (for example if a friend's link was opened on Mina's iPad): open any page with `?who=reset` (or `?who=mina` / `?who=beren`). That clears both folders and logs no row for that visit.
 - The "Study pages log" web app accepts kid values matching `^friend-[a-z-]{1,20}$` (since Nov 17, deployment version 2, same URL). Names with letters outside a-z (e.g. accents) are rejected there, so use a plain a-z spelling in `?who=`.
 - Plain links on a device with no saved name behave exactly as before. Pages need no changes; keep building them the same way. `window.studyWho` is `{name, kid}` for a friend visit, otherwise `null`, if a page wants to say the friend's name itself.
