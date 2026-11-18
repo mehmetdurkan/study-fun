@@ -56,6 +56,15 @@ https://mehmetdurkan.github.io/study-fun/mina/<page>/?who=FIRSTNAME
 - Plain links on a device with no saved name behave exactly as before. Pages need no changes; keep building them the same way. `window.studyWho` is `{name, kid}` for a friend visit, otherwise `null`, if a page wants to say the friend's name itself.
 - Never put full names or contact details in a link.
 
+## Daily STAAR question (Mina's pages, since 2026-11-18)
+
+`assets/more.js` also loads `assets/staar.js`. When a page (and its bonus round) ends, Mina gets one grade-4
+STAAR-style question for the day ("⭐ STAAR Practice", or "🏆 STAAR Challenge" for harder ones), then the
+"Want more?" picker. Questions live in `mina/staar/items.js`, one per date, in STAAR formats: multiple choice,
+"select TWO", type-in, and Part A/Part B with a short passage. They are original questions written to one
+grade-4 TEKS each, not copies of released tests. Once answered, the question doesn't show again that day on
+that device. It logs a finish row `<page>#staar-<id>` with the score.
+
 ## "Want more?" picker (Mina's pages, since 2026-11-17)
 
 Every Mina page loads `assets/more.js` right after `assets/log.js`:

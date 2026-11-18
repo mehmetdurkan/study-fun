@@ -6,10 +6,14 @@
 // A tap logs one open row tagged <page>#more-<subject> (or #more-no for "I'm done")
 // and opens mina/more/<subject>.html, a fresh set on this week's topic.
 // Nothing else is sent. Works with ?who= friends (log.js keeps the name).
+// It also loads assets/staar.js: today's STAAR question shows first, then this picker.
 (function(){
   var S = document.currentScript;
   if(!S || !window.studyLog) return;
   var base = new URL('../mina/more/', S.src).href;
+  // Daily STAAR question (assets/staar.js) comes first, then this picker.
+  try{ var st = document.createElement('script'); st.src = new URL('staar.js', S.src).href; document.head.appendChild(st); }catch(e){}
+  function gate(f){ if(window.studyGate) window.studyGate(f); else f(); }
   var SUBJ = [
     ['math',    '🧮', 'Math'],
     ['science', '🔬', 'Science'],
@@ -65,7 +69,7 @@
 
     // Put it right under the card that holds the score button.
     var wrap = document.querySelector('.wrap') || document.body;
-    var anchor = document.querySelector('#sendScore, a.send');
+    var anchor = document.getElementById('staarCard') || document.querySelector('#sendScore, a.send');
     while(anchor && anchor.parentElement && anchor.parentElement !== wrap) anchor = anchor.parentElement;
     if(anchor && anchor.parentElement === wrap) wrap.insertBefore(card, anchor.nextSibling);
     else wrap.appendChild(card);
@@ -76,8 +80,8 @@
   window.studyLog = function(ev, score, total){
     orig(ev, score, total);
     if(ev === 'finish') setTimeout(function(){
-      if(!/Want 5 bonus questions\?/.test(document.body.innerText || '')) show();
+      if(!/Want 5 bonus questions\?/.test(document.body.innerText || '')) gate(show);
     }, 400);
-    if(ev === 'extra_no' || ev === 'extra_finish') setTimeout(show, 400);
+    if(ev === 'extra_no' || ev === 'extra_finish') setTimeout(function(){ gate(show); }, 400);
   };
 })();

@@ -5,6 +5,7 @@
 // A 'finish' also saves {"kid/page": time} in localStorage 'studyDone' for the list's check marks.
 // Bonus round: studyLog('extra_yes') / studyLog('extra_no') / studyLog('extra_finish', score, total)
 // "Want more?" picker (assets/more.js): studyLog('more_math') etc. -> open row page#more-math; more_no -> page#more-no
+// Daily STAAR question (assets/staar.js): studyLog('staar_m1118', 1, 1) -> finish row page#staar-m1118
 //
 // Friends: a link with ?who=NAME (first name only) logs as kid "friend-NAME", says
 // "Hi Name!" on the page, and remembers NAME on that device (localStorage, shared by mina/ and beren/)
@@ -71,6 +72,8 @@
     var pg = page, x = EXTRA[event];
     // "Want more?" picker (assets/more.js): more_math etc. -> open row page#more-math, more_no -> page#more-no.
     if(!x && /^more_[a-z]{1,12}$/.test(event)) x = ['open', '#more-' + event.slice(5)];
+    // Daily STAAR question (assets/staar.js): staar_<id> -> finish row page#staar-<id> with its score.
+    if(!x && /^staar_[a-z0-9-]{1,24}$/.test(event)) x = ['finish', '#staar-' + event.slice(6)];
     if(x){ event = x[0]; pg = page.slice(0,70) + x[1]; }
     var body = new URLSearchParams({kid:logKid, page:pg.slice(0,80), event:event,
       score: score==null?'':String(score), total: total==null?'':String(total)});
