@@ -56,6 +56,24 @@ https://mehmetdurkan.github.io/study-fun/mina/<page>/?who=FIRSTNAME
 - Plain links on a device with no saved name behave exactly as before. Pages need no changes; keep building them the same way. `window.studyWho` is `{name, kid}` for a friend visit, otherwise `null`, if a page wants to say the friend's name itself.
 - Never put full names or contact details in a link.
 
+## "Want more?" picker (Mina's pages, since 2026-11-17)
+
+Every Mina page loads `assets/more.js` right after `assets/log.js`:
+
+```html
+<script src="../../assets/log.js"></script>
+<script src="../../assets/more.js"></script>
+```
+
+(`../assets/` for pages directly in `mina/`.) When the page is finished, a card asks "Want more? Pick a subject" with
+Math, Science, Reading & Writing and Texas History buttons, plus "I'm done for today". It appears after `finish`, or,
+on pages with a bonus round, after `extra_no` / `extra_finish`. Nothing to wire up in the page itself.
+
+- A tap logs one open row `<page>#more-<subject>` (or `<page>#more-no`) and opens `mina/more/<subject>.html`.
+- `mina/more/{math,science,reading,social}.html`: 8-question banks on this week's topics, 5 picked at random each
+  visit, first-try scoring, same picker at the end. Refresh the banks when the weekly newsletter topics change.
+- Counting demand: `#more-*` rows are choices, not page opens. `more/<subject>` open/finish rows are the extra sets.
+
 ## Activities lists (`mina/index.html`, `beren/index.html`)
 
 **Mina: do not edit `mina/index.html`.** It builds itself from `mina/pages.js`. To add a page, add one line at the top of the list in `mina/pages.js`:

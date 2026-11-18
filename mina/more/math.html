@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>More Math: Fraction Snacks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* "More" practice set: 5 random questions from this week's bank, then the "Want more?" picker (assets/more.js) */
+:root{
+  --bg:#f4f1ff; --paper:#ffffff; --ink:#221d3a; --muted:#625b80;
+  --accent:#6a4ff0; --accent-ink:#fff; --sun:#ffd34d; --sun-ink:#3a2a00;
+  --good:#1f9d63; --good-bg:#dcf5e8; --bad:#d4492f; --bad-bg:#fde4de; --line:#dcd5f3;
+  --display:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif; color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15122a; --paper:#201b3a; --ink:#efecfb; --muted:#ada6c9;
+  --accent:#a693ff; --accent-ink:#140f2b; --sun:#e8c043; --sun-ink:#221a00;
+  --good:#4fd093; --good-bg:#173a2a; --bad:#ff8a73; --bad-bg:#432019; --line:#383160; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15122a; --paper:#201b3a; --ink:#efecfb; --muted:#ada6c9;
+  --accent:#a693ff; --accent-ink:#140f2b; --sun:#e8c043; --sun-ink:#221a00;
+  --good:#4fd093; --good-bg:#173a2a; --bad:#ff8a73; --bad-bg:#432019; --line:#383160; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.45;
+  padding:max(20px,env(safe-area-inset-top,0px)) 16px 40px}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.back{color:var(--muted);font-weight:800;text-decoration:none;font-size:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-size:clamp(26px,6vw,36px);margin:0}
+.stars{font-family:var(--display);font-size:22px;color:var(--muted)}
+.intro{margin:0;color:var(--muted)}
+.week{align-self:flex-start;background:var(--sun);color:var(--sun-ink);font-weight:800;font-size:14px;border-radius:999px;padding:2px 12px}
+.dots{display:flex;gap:8px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--line)}
+.dot.on{background:var(--accent)} .dot.done{background:var(--good)}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.q{font-family:var(--display);font-size:24px;font-weight:600;margin:0}
+.opts{display:flex;flex-direction:column;gap:10px}
+button.opt{font:inherit;font-weight:800;text-align:left;padding:16px 18px;border-radius:16px;border:2px solid var(--line);background:var(--bg);color:var(--ink);min-height:56px;cursor:pointer}
+button.opt:focus-visible,.next:focus-visible,.send:focus-visible{outline:4px solid var(--sun);outline-offset:2px}
+button.opt.right{background:var(--good-bg);border-color:var(--good)}
+button.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.fb{margin:0;font-weight:700;min-height:1.4em}
+.next,.send{font:inherit;font-family:var(--display);font-size:22px;font-weight:700;border:0;border-radius:18px;padding:16px;background:var(--accent);color:var(--accent-ink);text-align:center;text-decoration:none;cursor:pointer}
+.next[hidden]{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">← Mina's activities</a>
+  <header><h1>🧮 More Math: Fraction Snacks</h1><span class="stars" id="stars">⭐ 0</span></header>
+  <span class="week">This week: Adding and subtracting fractions with the same denominator</span>
+  <p class="intro">5 quick fraction puzzles. When the bottom numbers match, the slices are the same size, so you only add or take away the top numbers!</p>
+  <div class="dots" id="dots"></div>
+  <div class="card" id="card"></div>
+</div>
+<script src="../../assets/log.js"></script>
+<script src="../../assets/more.js"></script>
+<script>
+const BANK=[{"q": "2/6 + 3/6 = ?", "o": ["5/6", "5/12", "6/6"], "a": 0, "why": "Yes! Same size slices (sixths), so 2 + 3 = 5 of them: 5/6."}, {"q": "7/8 − 3/8 = ?", "o": ["10/8", "4/8", "4/0"], "a": 1, "why": "Right! 7 eighths take away 3 eighths leaves 4/8. That is the same as one half."}, {"q": "Mina runs 3/10 of a mile, then 4/10 more. How far in all?", "o": ["7/20 of a mile", "1/10 of a mile", "7/10 of a mile"], "a": 2, "why": "Great! Tenths plus tenths: 3 + 4 = 7, so 7/10 of a mile."}, {"q": "A pizza has 8 slices (8/8). You eat 3/8. How much is left?", "o": ["5/8", "3/8", "11/8"], "a": 0, "why": "Yes! 8/8 − 3/8 = 5/8 left."}, {"q": "2/5 + 2/5 + 1/5 = ?", "o": ["5/15", "5/5, one whole!", "4/5"], "a": 1, "why": "Super! 2 + 2 + 1 = 5 fifths, and 5/5 is one whole."}, {"q": "4/9 + ?/9 = 7/9. What is the missing number?", "o": ["11", "3", "2"], "a": 1, "why": "Yes! 4 + 3 = 7, so the missing part is 3/9."}, {"q": "A water bottle is 9/10 full. You drink 6/10. How much is left?", "o": ["3/10", "15/10", "3/0"], "a": 0, "why": "Right! 9 − 6 = 3, so 3/10 is left."}, {"q": "Why is 1/4 + 2/4 NOT 3/8?", "o": ["Because quarters are bigger than eighths", "Because you add the bottoms too", "Because 3/8 is too big"], "a": 0, "why": "Exactly! The slices stay quarters. You only count how many: 3/4."}];
+const TITLE=document.querySelector('h1').textContent.replace(/^\S+\s/,'');
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+// 5 random questions; options shuffled, answer index remapped.
+const Q=shuffle(BANK).slice(0,5).map(x=>{const idx=shuffle(x.o.map((_,k)=>k));return {q:x.q,o:idx.map(k=>x.o[k]),a:idx.indexOf(x.a),why:x.why}});
+let i=0,score=0;
+const card=document.getElementById('card'),dots=document.getElementById('dots'),stars=document.getElementById('stars');
+function drawDots(){dots.innerHTML=Q.map((_,k)=>`<span class="dot ${k<i?'done':k===i?'on':''}"></span>`).join('')}
+function smsHref(t){t=encodeURIComponent(t);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function show(){
+  drawDots();
+  if(i>=Q.length){
+    card.innerHTML=`<p class="q">You got ${score} of ${Q.length} stars! ${score>=4?'🌟 Amazing!':'💪 Nice work!'}</p><a class="send" id="sendScore" href="#">Send Dad my score</a>`;
+    document.getElementById('sendScore').href=smsHref(`Mina here! I got ${score}/${Q.length} stars on ${TITLE} 🎉`);
+    if(window.studyLog)studyLog('finish',score,Q.length);
+    return;
+  }
+  const x=Q[i];let first=true;
+  card.innerHTML=`<p class="q">${x.q}</p><div class="opts">${x.o.map((t,k)=>`<button class="opt" data-k="${k}">${t}</button>`).join('')}</div><p class="fb" id="fb" aria-live="polite"></p><button class="next" id="next" hidden>Next ➜</button>`;
+  let done=false;
+  card.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(done)return;const k=+b.dataset.k;
+    if(k===x.a){done=true;b.classList.add('right');if(first){score++;stars.textContent='⭐ '+score}document.getElementById('fb').textContent=x.why;document.getElementById('next').hidden=false;document.getElementById('next').focus()}
+    else{first=false;b.classList.add('wrong');b.disabled=true;done=card.querySelectorAll('.opt:not([disabled])').length<=1;document.getElementById('fb').textContent='Hmm, not quite. Try another one!';
+      if(done){card.querySelector(`[data-k="${x.a}"]`).classList.add('right');document.getElementById('fb').textContent=x.why;document.getElementById('next').hidden=false}}
+  });
+  document.getElementById('next').onclick=()=>{i++;show()};
+}
+show();
+</script>
+</body>
+</html>
