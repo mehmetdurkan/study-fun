@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wish Card Demo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Demo only: a mock "page finished" score card, then the wish pop-up (bottom sheet). Sends nothing. */
+:root{
+  --bg:#fff7e8; --card:#ffffff; --fg:#2b2233; --muted:#776c80; --line:#f0e3cc;
+  --accent:#ff7a3d; --accent2:#7b4dff; --good:#1aa37a;
+  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif; color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1c1622; --card:#2a2232; --fg:#f6eefc; --muted:#bdb0c9; --line:#3d3347;
+  --accent:#ff9a66; --accent2:#a68bff; --good:#3ccf9e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1c1622; --card:#2a2232; --fg:#f6eefc; --muted:#bdb0c9; --line:#3d3347;
+  --accent:#ff9a66; --accent2:#a68bff; --good:#3ccf9e; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding:max(20px,env(safe-area-inset-top,0px)) 16px 40px}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px}
+.note{font-size:14px;color:var(--muted);border:2px dashed var(--line);border-radius:14px;padding:10px 12px}
+h1{font-family:var(--display);font-size:28px;margin:0}
+.big{font-family:var(--display);font-size:48px;font-weight:700;color:var(--accent);text-align:center}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.pill{font:inherit;font-weight:800;border:2px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:8px 14px;min-height:44px;cursor:pointer}
+.pill[aria-pressed="true"]{border-color:var(--accent2);background:color-mix(in srgb,var(--accent2) 14%,transparent)}
+.btn{font:inherit;font-family:var(--display);font-weight:600;font-size:18px;border:0;border-radius:14px;min-height:52px;padding:10px 16px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));width:100%}
+/* bottom sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;background:var(--card);color:var(--fg);
+  border-radius:24px 24px 0 0;padding:20px 16px max(20px,env(safe-area-inset-bottom,0px));
+  transform:translateY(105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);box-shadow:0 -10px 30px rgba(0,0,0,.2)}
+.sheet.on{transform:none}
+.grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+.sheet h2{font-family:var(--display);font-size:24px;margin:0 0 4px;text-align:center}
+.sheet p.sub{margin:0 0 14px;text-align:center;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{font:inherit;font-weight:800;font-size:16px;color:var(--fg);background:transparent;border:2px solid var(--line);border-radius:18px;
+  padding:12px 8px;min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer}
+.opt .e{font-size:30px;line-height:1}
+.opt:active{transform:scale(.97)}
+.opt.full{grid-column:1/-1;min-height:56px;flex-direction:row}
+.later{display:block;margin:12px auto 0;font:inherit;font-weight:800;color:var(--muted);background:none;border:0;min-height:44px;cursor:pointer}
+.thanks{text-align:center}
+.thanks .e{font-size:54px}
+.sms{display:flex;align-items:center;justify-content:center;margin-top:12px;min-height:52px;border-radius:14px;text-decoration:none;
+  font-family:var(--display);font-weight:600;font-size:17px;color:var(--fg);border:2px solid var(--line)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="note">👀 <b>Demo for Dad.</b> This sends nothing. On real pages the pop-up comes up about a second after the last activity (score, bonus, "Want more?").</p>
+  <div class="card">
+    <p style="margin:0 0 8px;font-weight:800">Show it as:</p>
+    <div class="row" id="who">
+      <button class="pill" data-k="mina" aria-pressed="true">Mina (4th grade)</button>
+      <button class="pill" data-k="beren" aria-pressed="false">Beren (9th grade)</button>
+    </div>
+  </div>
+  <div class="card">
+    <h1>Fraction Feast 🦃</h1>
+    <div class="big">4/5</div>
+    <p style="text-align:center;margin:0 0 14px">Great job! You added and took away fractions like a pro.</p>
+    <button class="btn" id="replay">Show the pop-up again</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="wishTitle">
+  <div class="grab"></div>
+  <div id="ask">
+    <h2 id="wishTitle">What should tomorrow be? 🌟</h2>
+    <p class="sub" id="wishSub">Pick one. I'll make it for you!</p>
+    <div class="grid" id="opts"></div>
+    <button class="later" id="later">Not now</button>
+  </div>
+  <div id="thanks" class="thanks" hidden>
+    <div class="e">🎉</div>
+    <h2>Got it!</h2>
+    <p class="sub" id="thanksMsg"></p>
+    <a class="sms" id="sms" href="#">💬 Tell Dad your own idea</a>
+    <button class="later" id="close">Close</button>
+  </div>
+</div>
+
+<script>
+const OPTS={
+  mina:[['game','🎮','A game'],['puzzle','🧩','Harder puzzles'],['story','📖','A story'],['experiment','🔬','An experiment'],['surprise','🎁','Surprise me!',1]],
+  beren:[['practice','📝','Practice test'],['flash','🃏','Flashcards'],['game','🎮','A quick game'],['explain','💡','Explain it simply'],['surprise','🎁','Surprise me',1]]
+};
+const SUB={mina:"Pick one. I'll make it for you!",beren:"Pick one for tomorrow's Night note."};
+let who='mina';
+const $=id=>document.getElementById(id);
+function smsHref(t){t=encodeURIComponent(t);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function build(){
+  $('wishSub').textContent=SUB[who];
+  $('opts').innerHTML=OPTS[who].map(([k,e,t,full])=>`<button class="opt${full?' full':''}" data-k="${k}" data-t="${t}"><span class="e">${e}</span>${t}</button>`).join('');
+  $('opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(b));
+}
+function open(){build();$('ask').hidden=false;$('thanks').hidden=true;$('scrim').classList.add('on');$('sheet').classList.add('on');setTimeout(()=>$('opts').querySelector('button').focus(),360)}
+function close(){$('scrim').classList.remove('on');$('sheet').classList.remove('on')}
+function pick(b){
+  const label=b.dataset.t.toLowerCase();
+  // Real pages: studyLog('wish_'+key) -> one open row "<page>#wish-<key>". Demo: nothing is sent.
+  $('ask').hidden=true;$('thanks').hidden=false;
+  $('thanksMsg').textContent=`You picked ${label}. Watch for it tomorrow!`;
+  $('sms').href=smsHref(who==='mina'?'My idea for tomorrow: ':'Idea for tomorrow\'s night note: ');
+}
+$('later').onclick=close;$('close').onclick=close;$('scrim').onclick=close;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+$('replay').onclick=open;
+$('who').querySelectorAll('.pill').forEach(p=>p.onclick=()=>{who=p.dataset.k;$('who').querySelectorAll('.pill').forEach(q=>q.setAttribute('aria-pressed',q===p?'true':'false'));open()});
+setTimeout(open,1000);
+</script>
+</body>
+</html>
