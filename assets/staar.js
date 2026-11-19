@@ -36,8 +36,10 @@
   function el(tagName, style, text){ var e = document.createElement(tagName); if(style) e.setAttribute('style', style); if(text!=null) e.textContent = text; return e; }
   var BTN = 'display:block;width:100%;text-align:left;font:inherit;font-weight:700;padding:12px 14px;margin:0 0 8px;border-radius:14px;' +
     'border:2px solid color-mix(in srgb,currentColor 30%,transparent);background:color-mix(in srgb,currentColor 5%,transparent);color:inherit;cursor:pointer;min-height:48px';
-  var GO = 'font:inherit;font-weight:800;padding:12px 18px;border-radius:14px;border:0;cursor:pointer;' +
-    'background:color-mix(in srgb,currentColor 85%,transparent);color:var(--bg,#fff);min-height:48px';
+  // Page button colors (every Mina page defines --accent / --accent-ink). Not currentColor: in a button's own
+  // background it means the button's text color, so text and box came out the same color (empty box on iPhone).
+  var GO = 'font:inherit;font-weight:800;font-size:18px;padding:12px 18px;border-radius:14px;border:0;cursor:pointer;' +
+    'background:var(--accent,#3a6ff0);color:var(--accent-ink,#fff);min-height:48px';
   var L = 'ABCDEFG';
 
   // One question (mc / multi / entry). cb(correct)
@@ -84,7 +86,10 @@
   }
 
   function render(x, next){
-    var card = el('section', 'margin:16px auto 0;max-width:640px;padding:18px;border-radius:22px;' +
+    // Lead-in + gentle reveal, so it reads as the next step after the score card (parent, 2026-11-18).
+    var lead = el('p', 'margin:28px auto 0;max-width:640px;text-align:center;font-weight:900;font-size:22px', '🎯 One more challenge!');
+    lead.setAttribute('aria-hidden', 'true');
+    var card = el('section', 'margin:8px auto 0;max-width:640px;padding:18px;border-radius:22px;' +
       'border:3px solid color-mix(in srgb,currentColor 35%,transparent);background:color-mix(in srgb,currentColor 4%,transparent)');
     card.id = 'staarCard';
     card.setAttribute('aria-label', 'Today\'s STAAR question');
@@ -118,7 +123,7 @@
       box.appendChild(el('p', 'margin:0 0 12px', x.why));
       mark(x.id, score);
       try{ window.studyLog && studyLog('staar_' + x.id, score, total); }catch(e){}
-      var nx = el('button', GO, 'Next ➜'); nx.type = 'button';
+      var nx = el('button', GO + ';display:block;width:100%', 'Want more? Pick a subject ➜'); nx.type = 'button';
       nx.onclick = function(){ nx.disabled = true; next(); };
       box.appendChild(nx);
     }
@@ -126,8 +131,15 @@
     var wrap = document.querySelector('.wrap') || document.body;
     var anchor = document.querySelector('#sendScore, a.send');
     while(anchor && anchor.parentElement && anchor.parentElement !== wrap) anchor = anchor.parentElement;
-    if(anchor && anchor.parentElement === wrap) wrap.insertBefore(card, anchor.nextSibling); else wrap.appendChild(card);
-    setTimeout(function(){ try{ card.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){} }, 900);
+    var calm = false; try{ calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+    [lead, card].forEach(function(x){ if(!calm){ x.style.opacity = '0'; x.style.transform = 'translateY(12px)';
+      x.style.transition = 'opacity .5s ease, transform .5s ease'; } });
+    var at = (anchor && anchor.parentElement === wrap) ? anchor.nextSibling : null;
+    wrap.insertBefore(lead, at); wrap.insertBefore(card, at);
+    // Show the lead-in a moment after the score card, then the question.
+    setTimeout(function(){ lead.style.opacity = '1'; lead.style.transform = 'none'; }, calm ? 0 : 700);
+    setTimeout(function(){ card.style.opacity = '1'; card.style.transform = 'none'; }, calm ? 0 : 1100);
+    setTimeout(function(){ try{ lead.scrollIntoView({behavior: calm ? 'auto' : 'smooth', block:'start'}); }catch(e){} }, 900);
   }
 
   // more.js calls studyGate(show) when the page ends.
