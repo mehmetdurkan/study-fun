@@ -6,13 +6,16 @@
 // A tap logs one open row tagged <page>#more-<subject> (or #more-no for "I'm done")
 // and opens mina/more/<subject>.html, a fresh set on this week's topic.
 // Nothing else is sent. Works with ?who= friends (log.js keeps the name).
-// It also loads assets/staar.js: today's STAAR question shows first, then this picker.
+// It also loads assets/staar.js: today's STAAR question shows first, then this picker,
+// and assets/wish.js: the "What should tomorrow be?" pop-up comes after the picker.
 (function(){
   var S = document.currentScript;
   if(!S || !window.studyLog) return;
   var base = new URL('../mina/more/', S.src).href;
   // Daily STAAR question (assets/staar.js) comes first, then this picker.
   try{ var st = document.createElement('script'); st.src = new URL('staar.js', S.src).href; document.head.appendChild(st); }catch(e){}
+  // "What should tomorrow be?" pop-up (assets/wish.js) opens after this picker shows.
+  try{ var ws = document.createElement('script'); ws.src = new URL('wish.js', S.src).href; document.head.appendChild(ws); }catch(e){}
   function gate(f){ if(window.studyGate) window.studyGate(f); else f(); }
   var SUBJ = [
     ['math',    '🧮', 'Math'],

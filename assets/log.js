@@ -6,6 +6,8 @@
 // Bonus round: studyLog('extra_yes') / studyLog('extra_no') / studyLog('extra_finish', score, total)
 // "Want more?" picker (assets/more.js): studyLog('more_math') etc. -> open row page#more-math; more_no -> page#more-no
 // Daily STAAR question (assets/staar.js): studyLog('staar_m1118', 1, 1) -> finish row page#staar-m1118
+// Wish for tomorrow (assets/wish.js): studyLog('wish_game') -> open row page#wish-game;
+//   studyLog('idea', 'make one about horses') -> idea row with the typed text (Sheet column G).
 //
 // Friends: a link with ?who=NAME (first name only) logs as kid "friend-NAME", says
 // "Hi Name!" on the page, and remembers NAME on that device (localStorage, shared by mina/ and beren/)
@@ -74,9 +76,15 @@
     if(!x && /^more_[a-z]{1,12}$/.test(event)) x = ['open', '#more-' + event.slice(5)];
     // Daily STAAR question (assets/staar.js): staar_<id> -> finish row page#staar-<id> with its score.
     if(!x && /^staar_[a-z0-9-]{1,24}$/.test(event)) x = ['finish', '#staar-' + event.slice(6)];
+    // Wish for tomorrow (assets/wish.js): wish_<key> -> open row page#wish-<key>.
+    if(!x && /^wish_[a-z]{1,12}$/.test(event)) x = ['open', '#wish-' + event.slice(5)];
+    // Typed idea: the text rides in its own field; score/total stay empty.
+    var text = '';
+    if(event==='idea'){ text = String(score==null?'':score).slice(0,80); score = null; total = null; }
     if(x){ event = x[0]; pg = page.slice(0,70) + x[1]; }
     var body = new URLSearchParams({kid:logKid, page:pg.slice(0,80), event:event,
       score: score==null?'':String(score), total: total==null?'':String(total)});
+    if(event==='idea') body.set('text', text);
     try{ if(navigator.sendBeacon && navigator.sendBeacon(URL, body)) return; }catch(e){}
     try{ fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,body:body}); }catch(e){}
   }
