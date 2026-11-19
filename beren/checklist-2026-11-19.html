@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thursday Checklist</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* One phone column: hero + progress, three groups of tap-to-check items, done banner */
+:root{
+  --bg:#eef6ff; --card:#ffffff; --fg:#14243a; --muted:#5f7088;
+  --accent:#2f6fe0; --accent2:#18b28a; --line:#d8e4f3; --done:#18b28a;
+  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1726; --card:#172235; --fg:#e9f1ff; --muted:#a3b3cc;
+  --accent:#6fa0ff; --accent2:#3cd6aa; --line:#2a3a55; --done:#3cd6aa; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1726; --card:#172235; --fg:#e9f1ff; --muted:#a3b3cc;
+  --accent:#6fa0ff; --accent2:#3cd6aa; --line:#2a3a55; --done:#3cd6aa; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding:max(20px,env(safe-area-inset-top,0px)) 16px 40px}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.back{color:var(--muted);font-weight:800;text-decoration:none}
+.tag{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:4px 0 6px}
+h2{font-family:var(--display);font-weight:600;font-size:19px;margin:0 0 8px}
+p{margin:0}
+.bar{height:12px;border-radius:999px;background:var(--line);overflow:hidden;margin-top:12px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s}
+.count{font-weight:800;margin-top:6px;color:var(--muted)}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.item{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;font:inherit;color:var(--fg);
+  background:transparent;border:2px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;min-height:52px}
+.box{flex:0 0 26px;height:26px;border-radius:8px;border:2px solid var(--muted);display:grid;place-items:center;font-weight:800;color:#fff}
+.t{font-weight:800}
+.s{display:block;font-size:14px;color:var(--muted);font-weight:600}
+.item[aria-pressed="true"]{border-color:var(--done);background:color-mix(in srgb,var(--done) 10%,transparent)}
+.item[aria-pressed="true"] .box{background:var(--done);border-color:var(--done)}
+.item[aria-pressed="true"] .t{text-decoration:line-through;opacity:.7}
+.item:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.yay{text-align:center;font-family:var(--display);font-size:22px;font-weight:700;color:var(--done)}
+.foot{text-align:center;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p><a class="back" href="./">← Beren's activities</a></p>
+  <section class="card">
+    <span class="tag">Thursday Nov 19 · A day</span>
+    <h1>Big day checklist ✅</h1>
+    <p>Lots due tomorrow, but it's all doable. Tap each one when it's done. Your checks stay saved on this phone.</p>
+    <div class="bar"><i id="bar"></i></div>
+    <p class="count" id="count"></p>
+  </section>
+  <section class="card"><h2>🌙 Tonight: finish &amp; turn in</h2><ul id="tonight"></ul></section>
+  <section class="card"><h2>📚 Tonight: quick review</h2><ul id="review"></ul></section>
+  <section class="card"><h2>🎒 Before bed / morning</h2><ul id="pack"></ul></section>
+  <section class="card yay" id="yay" hidden>All done! You're ready for tomorrow 💪</section>
+  <p class="foot">Coming up Friday: DECA permission forms (11:59 PM).</p>
+</div>
+<script src="../assets/log.js"></script>
+<script>
+const L={
+ tonight:[
+  ['geo63','Geometry 6.3 Similar Triangles','Due 8:15 AM'],
+  ['bio','Bio: Mendelian Genetics','Due 10:45 AM'],
+  ['eng','English: Micro Fiction fast draft','Due 2 PM. It\'s sharing day, so have it ready to read'],
+  ['pob','POBMF Ch 5.1 & 5.2 Vocabulary','Shows Missing. Do it in your notebook from the textbook'],
+  ['aphgv','APHG Unit 3 vocab','Due with the test']
+ ],
+ review:[
+  ['aphgt','APHG Unit 3 test review','Diffusion types, religions, folk vs pop. Try tonight\'s 2-min note'],
+  ['geoq','Geometry quiz: Similar Triangles & Proportional Lines','Similarity shortcuts (AA, SSS~, SAS~) and setting up proportions']
+ ],
+ pack:[
+  ['bag','Pack laptop (charged), calculator, pencils','Plus the vocab notebook'],
+  ['snack','Snack for English sharing (optional)','Not required, but a nice extra'],
+  ['sleep','Lights out by 10:30','Sleep helps a test more than one more hour of cramming']
+ ]
+};
+const KEY='checklist-2026-11-19';
+let S={};try{S=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+const total=Object.values(L).flat().length;let logged=false;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function update(){
+  const n=Object.values(S).filter(Boolean).length;
+  document.getElementById('bar').style.width=(100*n/total)+'%';
+  document.getElementById('count').textContent=`${n} of ${total} done`;
+  document.getElementById('yay').hidden=n<total;
+  if(n===total&&!logged&&window.studyLog){logged=true;studyLog('finish',n,total)}
+}
+for(const g in L){
+  const ul=document.getElementById(g);
+  for(const [id,t,s] of L[g]){
+    const li=document.createElement('li');const b=document.createElement('button');
+    b.className='item';b.setAttribute('aria-pressed',S[id]?'true':'false');
+    b.innerHTML=`<span class="box" aria-hidden="true">✓</span><span><span class="t">${t}</span><span class="s">${s}</span></span>`;
+    b.onclick=()=>{S[id]=!S[id];b.setAttribute('aria-pressed',S[id]?'true':'false');save();update()};
+    li.appendChild(b);ul.appendChild(li);
+  }
+}
+update();
+</script>
+</body>
+</html>
