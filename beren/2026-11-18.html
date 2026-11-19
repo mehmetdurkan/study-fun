@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beren's Night Notes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* One phone column: hero, folk vs pop diagram, 5 sort taps, score + bedtime recap */
+:root{
+  --bg:#f1f0ff; --card:#ffffff; --fg:#1f1c3a; --muted:#68658a;
+  --accent:#6a4ce0; --accent2:#e0559a; --good:#1aa37a; --bad:#c43a52; --line:#dedbf5;
+  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14122a; --card:#1f1c3a; --fg:#eeecff; --muted:#aeaad0;
+  --accent:#9d85ff; --accent2:#ff86bd; --good:#3ccf9e; --bad:#ff6b7d; --line:#34305a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14122a; --card:#1f1c3a; --fg:#eeecff; --muted:#aeaad0;
+  --accent:#9d85ff; --accent2:#ff86bd; --good:#3ccf9e; --bad:#ff6b7d; --line:#34305a; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding:max(20px,env(safe-area-inset-top,0px)) 16px 40px}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.tag{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2)}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+p{margin:0}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--body);fill:var(--fg);font-size:13px}
+.q{display:flex;flex-direction:column;gap:10px}
+.num{font-family:var(--display);font-size:13px;color:var(--muted)}
+.prompt{font-weight:800;font-size:18px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button{flex:1 1 40%;font:inherit;font-weight:800;font-size:18px;min-height:52px;padding:10px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
+.opts button.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 15%,transparent)}
+.opts button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.opts button:disabled{cursor:default}
+.why{padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.score{text-align:center}
+.big{font-family:var(--display);font-size:44px;font-weight:700;color:var(--accent)}
+.send{display:inline-flex;align-items:center;justify-content:center;margin-top:6px;width:100%;min-height:52px;padding:10px 16px;border-radius:14px;text-decoration:none;font-family:var(--display);font-weight:600;font-size:18px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.foot{text-align:center;font-size:13px;color:var(--muted)}
+button:focus-visible,.send:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <span class="tag">Human Geography · before-sleep recap</span>
+    <h1>Folk or pop? 🎸</h1>
+    <p>Last warm-up before Thursday's Unit 3 test. Read each example and tap Folk or Pop. 5 quick ones, then a 3-line recap to sleep on.</p>
+  </section>
+  <section class="card">
+    <svg viewBox="0 0 340 176" role="img" aria-label="Folk culture: small, rural, traditional, changes slowly, spreads by relocation, tied to one place. Popular culture: large, urban, changes fast, spreads by hierarchical and contagious diffusion, looks the same everywhere.">
+      <rect x="4" y="6" width="160" height="128" rx="12" fill="none" stroke="currentColor" stroke-opacity=".25"/>
+      <text x="16" y="28" font-weight="800" fill="#e0559a">Folk culture</text>
+      <text x="16" y="52">small, rural group</text>
+      <text x="16" y="74">traditions, slow change</text>
+      <text x="16" y="96">spreads by relocation</text>
+      <text x="16" y="118">tied to one place</text>
+      <rect x="176" y="6" width="160" height="128" rx="12" fill="none" stroke="currentColor" stroke-opacity=".25"/>
+      <text x="188" y="28" font-weight="800" fill="#6a4ce0">Popular culture</text>
+      <text x="188" y="52">big, urban, global</text>
+      <text x="188" y="74">trends, fast change</text>
+      <text x="188" y="96">hierarchical/contagious</text>
+      <text x="188" y="118">same everywhere</text>
+      <rect x="4" y="142" width="332" height="30" rx="10" fill="none" stroke="currentColor" stroke-opacity=".25"/>
+      <text x="16" y="162">Too much pop can lead to <tspan font-weight="800">placelessness</tspan>.</text>
+    </svg>
+  </section>
+  <section class="card q" id="game"></section>
+  <section class="card score" id="done" hidden>
+    <div class="big" id="big"></div>
+    <p id="msg"></p>
+    <a class="send" id="sendScore" href="#">Send Dad my score</a>
+  </section>
+  <p class="foot">Review only. Sleep well and good luck Thursday!</p>
+</div>
+<script src="../assets/log.js"></script>
+<script>
+const Q=[
+ {p:'Handmade wool rugs with a pattern one mountain village has used for 300 years.',o:['Folk','Pop'],a:0,why:'Folk. Small group, one place, passed down for generations, slow to change.'},
+ {p:'A dance trend that starts in Los Angeles and is in every middle school a week later.',o:['Folk','Pop'],a:1,why:'Pop. It starts in a big city and spreads fast through phones and media.'},
+ {p:'The same fast-food chain, mall stores and gas stations in every city you drive through.',o:['Folk','Pop'],a:1,why:'Pop. When towns all look alike, geographers call it placelessness.'},
+ {p:'Amish families who farm with horses and keep plain clothing styles.',o:['Folk','Pop'],a:0,why:'Folk. A tight group that keeps its traditions and resists outside trends.'},
+ {p:'Houses built from local stone or adobe because that is what the land around them gives.',o:['Folk','Pop'],a:0,why:'Folk. Folk housing uses local materials and fits the local climate.'}
+];
+const RECAP='Tonight\'s recap: folk = small, rural, traditional, tied to place. Pop = urban, fast, global. Pop spreading everywhere = placelessness.';
+let i=0,score=0;const g=document.getElementById('game');
+function smsHref(t){t=encodeURIComponent(t);const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?`sms:&body=${t}`:`sms:?&body=${t}`}
+function show(){
+  if(i>=Q.length){g.hidden=true;const d=document.getElementById('done');d.hidden=false;
+    document.getElementById('big').textContent=`${score}/${Q.length}`;
+    document.getElementById('msg').textContent=(score>=4?'Nice! You\'re ready. ':'Good practice. ')+RECAP;
+    document.getElementById('sendScore').href=smsHref(`Beren here: ${score}/${Q.length} on tonight's APHG folk vs pop`);
+    if(window.studyLog)studyLog('finish',score,Q.length);
+    try{localStorage.setItem('nn-2026-11-18',score)}catch(e){}return}
+  const x=Q[i];
+  g.innerHTML=`<span class="num">${i+1} of ${Q.length}</span><p class="prompt">${x.p}</p><div class="opts">${x.o.map((t,k)=>`<button data-k="${k}">${t}</button>`).join('')}</div><p class="why" id="why" hidden></p>`;
+  g.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.k;g.querySelectorAll('.opts button').forEach(z=>z.disabled=true);
+    g.querySelector(`[data-k="${x.a}"]`).classList.add('right');
+    if(k===x.a)score++;else b.classList.add('wrong');
+    const w=document.getElementById('why');w.hidden=false;w.textContent=(k===x.a?'✅ ':'Almost! ')+x.why;
+    setTimeout(()=>{i++;show()},1800);
+  });
+}
+show();
+</script>
+</body>
+</html>
