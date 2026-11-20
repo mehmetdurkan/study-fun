@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Snowflake Slope</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700;800&display=swap">
+<style>
+/* Friday fun: just a game. Steer a skier, dodge trees, catch snowflakes. */
+:root{
+  --bg:#eaf4ff; --paper:#ffffff; --ink:#1d2b3a; --muted:#5c6f84; --accent:#2f6fe0; --accent2:#7b4dff;
+  --line:#d4e3f5; --snow:#f7fbff; --display:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif; color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1824; --paper:#18243a; --ink:#eef4ff; --muted:#a9bad0; --accent:#8fb2ff; --accent2:#b59cff;
+  --line:#2c3b55; --snow:#dfeaf7; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1824; --paper:#18243a; --ink:#eef4ff; --muted:#a9bad0; --accent:#8fb2ff; --accent2:#b59cff;
+  --line:#2c3b55; --snow:#dfeaf7; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{overscroll-behavior:none}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.45;
+  padding:max(14px,env(safe-area-inset-top,0px)) 16px max(20px,env(safe-area-inset-bottom,0px))}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.back{color:var(--muted);font-weight:800;text-decoration:none;font-size:16px}
+h1{font-family:var(--display);font-size:clamp(28px,7vw,38px);margin:0;line-height:1.1}
+.intro{margin:0;color:var(--muted)}
+.hud{display:flex;justify-content:space-between;font-family:var(--display);font-weight:600;font-size:20px}
+.stage{position:relative;border-radius:22px;overflow:hidden;border:2px solid var(--line);background:var(--snow);touch-action:none;user-select:none;-webkit-user-select:none}
+canvas{display:block;width:100%;height:auto}
+.over{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  background:color-mix(in srgb,var(--paper) 88%,transparent);text-align:center;padding:20px}
+.over[hidden]{display:none}
+.big{font-family:var(--display);font-size:48px;font-weight:700;color:var(--accent);line-height:1}
+.btn{font:inherit;font-family:var(--display);font-weight:600;font-size:22px;border:0;border-radius:16px;min-height:56px;padding:0 28px;
+  color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer}
+.send{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:14px;
+  border:2px solid var(--line);color:var(--ink);text-decoration:none;font-weight:800}
+.tip{font-size:15px;color:var(--muted);text-align:center;margin:0}
+.btn:focus-visible,.send:focus-visible,.back:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← All of Mina's pages</a>
+  <h1>Snowflake Slope ⛷️</h1>
+  <p class="intro">No questions today, just fun! Steer down the mountain, dodge the trees, catch the snowflakes.</p>
+  <div class="hud"><span id="hearts">❤️❤️❤️</span><span>❄️ <span id="score">0</span></span><span>🏆 <span id="best">0</span></span></div>
+  <div class="stage" id="stage">
+    <canvas id="c" width="360" height="520" aria-label="Ski game"></canvas>
+    <div class="over" id="start">
+      <div style="font-size:56px">⛷️</div>
+      <p style="margin:0;font-weight:800">Touch and hold the left or right side to steer.<br>On a computer: arrow keys.</p>
+      <button class="btn" id="go" type="button">Go!</button>
+    </div>
+    <div class="over" id="end" hidden>
+      <div id="endMsg" style="font-family:var(--display);font-size:24px;font-weight:600"></div>
+      <div class="big" id="final">0</div>
+      <p style="margin:0" id="bestMsg"></p>
+      <button class="btn" id="again" type="button">Play again</button>
+      <a class="send" id="sendScore" href="#">Send Dad my score</a>
+    </div>
+  </div>
+  <p class="tip">Snowflakes ❄️ = 1 point · Golden star ⭐ = 5 points · Trees 🌲 cost a heart</p>
+</div>
+<script src="../assets/log.js"></script>
+<script src="../assets/wish.js"></script>
+<script>
+(function(){
+  var cv=document.getElementById('c'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  var dpr=Math.min(window.devicePixelRatio||1,2);cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
+  var BKEY='snowflakeSlopeBest',best=0;try{best=+localStorage.getItem(BKEY)||0}catch(e){}
+  var $=function(id){return document.getElementById(id)};$('best').textContent=best;
+  var px,speed,items,score,hearts,hurt,left,right,running=false,last,dist,spawnT,finished=0;
+  function reset(){px=W/2;speed=170;items=[];score=0;hearts=3;hurt=0;dist=0;spawnT=0;left=right=false;
+    $('score').textContent=0;$('hearts').textContent='❤️❤️❤️'}
+  function spawn(){
+    var r=Math.random(),x=24+Math.random()*(W-48);
+    if(r<0.55)items.push({t:'🌲',x:x,y:H+30,s:34,bad:true});
+    else if(r<0.62)items.push({t:'🪨',x:x,y:H+30,s:28,bad:true});
+    else if(r<0.95)items.push({t:'❄️',x:x,y:H+30,s:26,pts:1});
+    else items.push({t:'⭐',x:x,y:H+30,s:28,pts:5});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(120,150,190,.18)';ctx.lineWidth=2;
+    for(var i=0;i<6;i++){var y=((i*100)-(dist%100)+600)%600-40;ctx.beginPath();ctx.moveTo(20+i*50,y);ctx.lineTo(40+i*50,y+30);ctx.stroke()}
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    items.forEach(function(o){ctx.font=o.s+'px system-ui';ctx.fillText(o.t,o.x,o.y)});
+    if(!(hurt>0&&Math.floor(hurt*10)%2)){ctx.font='40px system-ui';ctx.save();ctx.translate(px,110);
+      var tilt=(right?1:0)-(left?1:0);ctx.rotate(tilt*0.25);ctx.fillText('⛷️',0,0);ctx.restore()}
+  }
+  function tick(now){
+    if(!running)return;
+    var dt=Math.min((now-last)/1000,0.05);last=now;
+    var steer=(right?1:0)-(left?1:0);px=Math.max(20,Math.min(W-20,px+steer*230*dt));
+    speed+=6*dt;dist+=speed*dt;spawnT-=dt;
+    if(spawnT<=0){spawn();spawnT=Math.max(0.28,0.75-speed/1200)}
+    if(hurt>0)hurt-=dt;
+    for(var i=items.length-1;i>=0;i--){var o=items[i];o.y-=speed*dt;
+      if(Math.abs(o.x-px)<(o.s/2+12)&&Math.abs(o.y-110)<(o.s/2+12)){
+        if(o.bad){if(hurt<=0){hearts--;hurt=1.2;$('hearts').textContent='❤️'.repeat(hearts)+'🤍'.repeat(3-hearts);if(navigator.vibrate)try{navigator.vibrate(80)}catch(e){}}}
+        else{score+=o.pts;$('score').textContent=score}
+        items.splice(i,1);continue}
+      if(o.y<-40)items.splice(i,1)}
+    draw();
+    if(hearts<=0)return end();
+    requestAnimationFrame(tick);
+  }
+  function start(){reset();$('start').hidden=true;$('end').hidden=true;running=true;last=performance.now();requestAnimationFrame(tick)}
+  function smsHref(t){t=encodeURIComponent(t);var ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);return ios?'sms:&body='+t:'sms:?&body='+t}
+  function end(){
+    running=false;left=right=false;var isBest=score>best;
+    if(isBest){best=score;try{localStorage.setItem(BKEY,best)}catch(e){};$('best').textContent=best}
+    $('final').textContent='❄️ '+score;
+    $('endMsg').textContent=isBest?'New record! 🎉':(score>=best*0.7?'So close to your record!':'Nice run!');
+    $('bestMsg').textContent='Your best: '+best;
+    var who=(window.studyWho&&window.studyWho.name)||'Mina';
+    $('sendScore').href=smsHref(who+' here: '+score+' snowflakes on Snowflake Slope! ⛷️');
+    $('end').hidden=false;
+    finished++;
+    if(window.studyLog&&finished<=5)studyLog('finish',score,best);
+  }
+  var stage=$('stage');
+  function setDir(e){var r=stage.getBoundingClientRect(),t=e.touches?e.touches[0]:e;if(!t)return;
+    var x=t.clientX-r.left;left=x<r.width/2;right=!left}
+  stage.addEventListener('pointerdown',function(e){if(!running)return;setDir(e);e.preventDefault()});
+  stage.addEventListener('pointermove',function(e){if(running&&(left||right))setDir(e)});
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){stage.addEventListener(ev,function(){left=right=false})});
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'){left=true;e.preventDefault()}if(e.key==='ArrowRight'){right=true;e.preventDefault()}});
+  document.addEventListener('keyup',function(e){if(e.key==='ArrowLeft')left=false;if(e.key==='ArrowRight')right=false});
+  $('go').onclick=start;$('again').onclick=start;
+  reset();draw();
+})();
+</script>
+</body>
+</html>
