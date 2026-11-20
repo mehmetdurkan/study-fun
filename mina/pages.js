@@ -6,6 +6,7 @@
 //   date:    the day the page went live, Central time, "YYYY-MM-DD"
 //   blurb:   one short line (optional)
 window.MINA_PAGES = [
+  {url:'2026-11-20.html', title:'Snowflake Slope', subject:'social', date:'2026-11-20', blurb:'Friday fun: dodge trees, catch snowflakes'},
   {url:'2026-11-19.html',     title:'Capitol Quest',      subject:'social',  date:'2026-11-19', blurb:'5 questions about the Texas Capitol: who makes, leads and judges the laws'},
   {url:'2026-11-18.html',     title:'Fraction Feast',     subject:'math',    date:'2026-11-18', blurb:'5 Thanksgiving puzzles: add and take away fractions with the same bottom number'},
   {url:'convince-me/',        title:'Convince Me!',       subject:'writing', date:'2026-11-16', blurb:'Build an argument in 5 steps: claim, reason, evidence, pushback, ending'},
