@@ -36,6 +36,7 @@ canvas{display:block;width:100%;height:auto}
   color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer}
 .send{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:14px;
   border:2px solid var(--line);color:var(--ink);text-decoration:none;font-weight:800}
+.cheer{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 14%,var(--paper)),color-mix(in srgb,var(--accent2) 14%,var(--paper)));border:2px solid var(--line);border-radius:18px;padding:14px 16px;font-size:18px;line-height:1.4}
 .how{margin:0;padding:0;list-style:none;text-align:left;display:flex;flex-direction:column;gap:6px;font-size:16px;max-width:300px}
 .tip{font-size:15px;color:var(--muted);text-align:center;margin:0}
 .btn:focus-visible,.send:focus-visible,.back:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
@@ -45,7 +46,8 @@ canvas{display:block;width:100%;height:auto}
 <div class="wrap">
   <a class="back" href="./">← All of Mina's pages</a>
   <h1>Snowflake Slope ⛷️</h1>
-  <p class="intro">No questions today, just fun! Steer down the mountain, dodge the trees, catch the snowflakes.</p>
+  <div class="cheer">🎉 <b>You did it, a whole week of hard work!</b><br>You learned so much and kept going every day. Today is Friday, so no questions, just fun. You earned this break! 🌟</div>
+  <p class="intro">Steer down the mountain, dodge the trees, catch the snowflakes.</p>
   <div class="hud"><span id="hearts">❤️❤️❤️</span><span>⏱️ <span id="time">60</span></span><span>❄️ <span id="score">0</span></span><span>🏆 <span id="best">0</span></span></div>
   <div class="stage" id="stage">
     <canvas id="c" width="360" height="520" aria-label="Ski game"></canvas>
