@@ -36,6 +36,7 @@ canvas{display:block;width:100%;height:auto}
   color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer}
 .send{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:14px;
   border:2px solid var(--line);color:var(--ink);text-decoration:none;font-weight:800}
+.how{margin:0;padding:0;list-style:none;text-align:left;display:flex;flex-direction:column;gap:6px;font-size:16px;max-width:300px}
 .tip{font-size:15px;color:var(--muted);text-align:center;margin:0}
 .btn:focus-visible,.send:focus-visible,.back:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 </style>
@@ -45,13 +46,20 @@ canvas{display:block;width:100%;height:auto}
   <a class="back" href="./">← All of Mina's pages</a>
   <h1>Snowflake Slope ⛷️</h1>
   <p class="intro">No questions today, just fun! Steer down the mountain, dodge the trees, catch the snowflakes.</p>
-  <div class="hud"><span id="hearts">❤️❤️❤️</span><span>❄️ <span id="score">0</span></span><span>🏆 <span id="best">0</span></span></div>
+  <div class="hud"><span id="hearts">❤️❤️❤️</span><span>⏱️ <span id="time">60</span></span><span>❄️ <span id="score">0</span></span><span>🏆 <span id="best">0</span></span></div>
   <div class="stage" id="stage">
     <canvas id="c" width="360" height="520" aria-label="Ski game"></canvas>
     <div class="over" id="start">
-      <div style="font-size:56px">⛷️</div>
-      <p style="margin:0;font-weight:800">Touch and hold the left or right side to steer.<br>On a computer: arrow keys.</p>
-      <button class="btn" id="go" type="button">Go!</button>
+      <div style="font-family:var(--display);font-size:26px;font-weight:600">How to play ⛷️</div>
+      <ul class="how">
+        <li><b>👆 Steer:</b> hold the left or right side of the slope (computer: arrow keys)</li>
+        <li><b>❄️ Snowflake:</b> +1 point</li>
+        <li><b>⭐ Gold star:</b> +5 points</li>
+        <li><b>🌲 🪨 Trees and rocks:</b> you lose a heart</li>
+        <li><b>⏱️ 60 seconds.</b> The run ends when time is up or your 3 hearts are gone</li>
+        <li><b>🏃 Faster and faster!</b> Beat your best score</li>
+      </ul>
+      <button class="btn" id="go" type="button">Ready? Go!</button>
     </div>
     <div class="over" id="end" hidden>
       <div id="endMsg" style="font-family:var(--display);font-size:24px;font-weight:600"></div>
@@ -61,7 +69,7 @@ canvas{display:block;width:100%;height:auto}
       <a class="send" id="sendScore" href="#">Send Dad my score</a>
     </div>
   </div>
-  <p class="tip">Snowflakes ❄️ = 1 point · Golden star ⭐ = 5 points · Trees 🌲 cost a heart</p>
+  <p class="tip">❄️ = 1 point · ⭐ = 5 points · 🌲🪨 cost a heart · ⏱️ 60 seconds</p>
 </div>
 <script src="../assets/log.js"></script>
 <script src="../assets/wish.js"></script>
@@ -71,9 +79,9 @@ canvas{display:block;width:100%;height:auto}
   var dpr=Math.min(window.devicePixelRatio||1,2);cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
   var BKEY='snowflakeSlopeBest',best=0;try{best=+localStorage.getItem(BKEY)||0}catch(e){}
   var $=function(id){return document.getElementById(id)};$('best').textContent=best;
-  var px,speed,items,score,hearts,hurt,left,right,running=false,last,dist,spawnT,finished=0;
+  var px,speed,items,score,hearts,hurt,left,right,running=false,last,dist,spawnT,finished=0,timeLeft,why;
   function reset(){px=W/2;speed=170;items=[];score=0;hearts=3;hurt=0;dist=0;spawnT=0;left=right=false;
-    $('score').textContent=0;$('hearts').textContent='❤️❤️❤️'}
+    timeLeft=60;why='';$('time').textContent=60;$('score').textContent=0;$('hearts').textContent='❤️❤️❤️'}
   function spawn(){
     var r=Math.random(),x=24+Math.random()*(W-48);
     if(r<0.55)items.push({t:'🌲',x:x,y:H+30,s:34,bad:true});
@@ -94,7 +102,7 @@ canvas{display:block;width:100%;height:auto}
     if(!running)return;
     var dt=Math.min((now-last)/1000,0.05);last=now;
     var steer=(right?1:0)-(left?1:0);px=Math.max(20,Math.min(W-20,px+steer*230*dt));
-    speed+=6*dt;dist+=speed*dt;spawnT-=dt;
+    speed+=6*dt;dist+=speed*dt;spawnT-=dt;timeLeft-=dt;var tl=Math.max(0,Math.ceil(timeLeft));if($('time').textContent!=tl)$('time').textContent=tl;
     if(spawnT<=0){spawn();spawnT=Math.max(0.28,0.75-speed/1200)}
     if(hurt>0)hurt-=dt;
     for(var i=items.length-1;i>=0;i--){var o=items[i];o.y-=speed*dt;
@@ -104,7 +112,8 @@ canvas{display:block;width:100%;height:auto}
         items.splice(i,1);continue}
       if(o.y<-40)items.splice(i,1)}
     draw();
-    if(hearts<=0)return end();
+    if(hearts<=0){why='hearts';return end()}
+    if(timeLeft<=0){why='time';return end()}
     requestAnimationFrame(tick);
   }
   function start(){reset();$('start').hidden=true;$('end').hidden=true;running=true;last=performance.now();requestAnimationFrame(tick)}
@@ -113,7 +122,7 @@ canvas{display:block;width:100%;height:auto}
     running=false;left=right=false;var isBest=score>best;
     if(isBest){best=score;try{localStorage.setItem(BKEY,best)}catch(e){};$('best').textContent=best}
     $('final').textContent='❄️ '+score;
-    $('endMsg').textContent=isBest?'New record! 🎉':(score>=best*0.7?'So close to your record!':'Nice run!');
+    $('endMsg').textContent=(why==='time'?'⏱️ Time is up! ':'💥 Out of hearts! ')+(isBest?'New record! 🎉':(score>=best*0.7?'So close to your record!':'Nice run!'));
     $('bestMsg').textContent='Your best: '+best;
     var who=(window.studyWho&&window.studyWho.name)||'Mina';
     $('sendScore').href=smsHref(who+' here: '+score+' snowflakes on Snowflake Slope! ⛷️');
